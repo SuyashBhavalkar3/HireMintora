@@ -1,0 +1,257 @@
+asyncapi: '2.0.0'
+info:
+  title: HireMintora WebSocket API
+  version: 1.0.0
+  description: WebSocket API documentation for HireMintora interview system
+servers:
+  development:
+    url: ws://localhost:3000/ws/interview
+    protocol: ws
+    description: Development WebSocket server
+channels:
+  /ws/interview:
+    description: Interview WebSocket endpoint for audio, text, code, and state events.
+    parameters:
+      sessionId:
+        description: Unique session identifier for the interview session.
+        schema:
+          type: string
+      tokenId:
+        description: Optional token identifier for authentication/context.
+        schema:
+          type: string
+      mode:
+        description: Interview mode, default or coding.
+        schema:
+          type: string
+          enum: [default, coding]
+    publish:
+      summary: Messages sent from the client to the server.
+      message:
+        oneOf:
+          - $ref: '#/components/messages/audio_chunk'
+          - $ref: '#/components/messages/audio_end'
+          - $ref: '#/components/messages/text_answer'
+          - $ref: '#/components/messages/code_submission'
+          - $ref: '#/components/messages/cancel_turn'
+    subscribe:
+      summary: Messages sent from the server to the client.
+      message:
+        oneOf:
+          - $ref: '#/components/messages/transcript_partial'
+          - $ref: '#/components/messages/transcript_final'
+          - $ref: '#/components/messages/ai_text_chunk'
+          - $ref: '#/components/messages/tts_audio_chunk'
+          - $ref: '#/components/messages/state_change'
+components:
+  messages:
+    audio_chunk:
+      name: audio_chunk
+      title: Audio chunk
+      payload:
+        type: object
+        properties:
+          type:
+            type: string
+            enum: [audio_chunk]
+          sessionId:
+            type: string
+            description: Optional session ID override.
+          payload:
+            type: object
+            properties:
+              audioData:
+                type: string
+                description: Base64 encoded audio data.
+              timestamp:
+                type: number
+                description: Audio timestamp.
+        required:
+          - type
+          - payload
+    audio_end:
+      name: audio_end
+      title: Audio end
+      payload:
+        type: object
+        properties:
+          type:
+            type: string
+            enum: [audio_end]
+          sessionId:
+            type: string
+            description: Optional session ID override.
+          payload:
+            type: object
+            properties:
+              finalAudioData:
+                type: string
+                description: Base64 encoded final audio chunk.
+        required:
+          - type
+          - payload
+    text_answer:
+      name: text_answer
+      title: Text answer
+      payload:
+        type: object
+        properties:
+          type:
+            type: string
+            enum: [text_answer]
+          sessionId:
+            type: string
+            description: Optional session ID override.
+          payload:
+            type: object
+            properties:
+              text:
+                type: string
+                description: Text response from user.
+        required:
+          - type
+          - payload
+    code_submission:
+      name: code_submission
+      title: Code submission
+      payload:
+        type: object
+        properties:
+          type:
+            type: string
+            enum: [code_submission]
+          sessionId:
+            type: string
+            description: Optional session ID override.
+          payload:
+            type: object
+            properties:
+              code:
+                type: string
+                description: Code submitted by user.
+              language:
+                type: string
+                description: Programming language.
+        required:
+          - type
+          - payload
+    cancel_turn:
+      name: cancel_turn
+      title: Cancel turn
+      payload:
+        type: object
+        properties:
+          type:
+            type: string
+            enum: [cancel_turn]
+          sessionId:
+            type: string
+            description: Optional session ID override.
+        required:
+          - type
+    transcript_partial:
+      name: transcript_partial
+      title: Transcript partial
+      payload:
+        type: object
+        properties:
+          type:
+            type: string
+            enum: [transcript_partial]
+          payload:
+            type: object
+            properties:
+              text:
+                type: string
+                description: Partial transcript text.
+              confidence:
+                type: number
+                description: Confidence score.
+        required:
+          - type
+          - payload
+    transcript_final:
+      name: transcript_final
+      title: Transcript final
+      payload:
+        type: object
+        properties:
+          type:
+            type: string
+            enum: [transcript_final]
+          payload:
+            type: object
+            properties:
+              text:
+                type: string
+                description: Final transcript text.
+              confidence:
+                type: number
+                description: Confidence score.
+        required:
+          - type
+          - payload
+    ai_text_chunk:
+      name: ai_text_chunk
+      title: AI text chunk
+      payload:
+        type: object
+        properties:
+          type:
+            type: string
+            enum: [ai_text_chunk]
+          payload:
+            type: object
+            properties:
+              text:
+                type: string
+                description: AI response text chunk.
+              isComplete:
+                type: boolean
+                description: Whether this is the final chunk.
+        required:
+          - type
+          - payload
+    tts_audio_chunk:
+      name: tts_audio_chunk
+      title: TTS audio chunk
+      payload:
+        type: object
+        properties:
+          type:
+            type: string
+            enum: [tts_audio_chunk]
+          payload:
+            type: object
+            properties:
+              audioData:
+                type: string
+                description: Base64 encoded TTS audio data.
+              isComplete:
+                type: boolean
+                description: Whether this is the final audio chunk.
+        required:
+          - type
+          - payload
+    state_change:
+      name: state_change
+      title: State change
+      payload:
+        type: object
+        properties:
+          type:
+            type: string
+            enum: [state_change]
+          payload:
+            type: object
+            properties:
+              state:
+                type: string
+                enum: [LISTENING, PROCESSING, SPEAKING]
+                description: Current interview state.
+              message:
+                type: string
+                description: Optional state change message.
+        required:
+          - type
+          - payload

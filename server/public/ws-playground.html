@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HireMintora WebSocket Playground</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f4f7fb;
+      color: #1f2937;
+    }
+    header {
+      background: #1f2937;
+      color: white;
+      padding: 24px 28px;
+      text-align: center;
+    }
+    main {
+      max-width: 1080px;
+      margin: 24px auto;
+      padding: 0 24px 48px;
+    }
+    .panel {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    .panel h2 {
+      margin-top: 0;
+    }
+    .field {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    label {
+      font-weight: 600;
+    }
+    input[type=text], textarea {
+      width: 100%;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-family: inherit;
+      font-size: 14px;
+      box-sizing: border-box;
+      background: #f9fafb;
+    }
+    textarea {
+      min-height: 180px;
+      resize: vertical;
+    }
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 12px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    button.primary {
+      background: #2563eb;
+      color: white;
+    }
+    button.primary:hover {
+      background: #1d4ed8;
+    }
+    button.secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+    button.secondary:hover {
+      background: #d1d5db;
+    }
+    .status {
+      font-weight: 700;
+      margin-left: auto;
+    }
+    .log {
+      background: #111827;
+      color: #f8fafc;
+      border-radius: 14px;
+      padding: 16px;
+      min-height: 240px;
+      white-space: pre-wrap;
+      overflow-y: auto;
+      font-family: Menlo, Monaco, Consolas, monospace;
+      font-size: 13px;
+    }
+    .examples button {
+      background: #0f172a;
+      color: white;
+    }
+    .examples button:hover {
+      background: #334155;
+    }
+    .note {
+      color: #4b5563;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .grid-2 {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+    a.link {
+      color: #2563eb;
+      text-decoration: none;
+    }
+    a.link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>HireMintora WebSocket Playground</h1>
+    <p>Connect, send messages, and inspect server responses in one page.</p>
+  </header>
+
+  <main>
+    <div class="panel">
+      <div class="row">
+        <div>
+          <h2>Connection</h2>
+          <p class="note">Use this page to test the WebSocket endpoint with JSON payloads.</p>
+        </div>
+        <div class="status" id="connection-status">Disconnected</div>
+      </div>
+
+      <div class="field">
+        <label for="ws-url">WebSocket URL</label>
+        <input id="ws-url" type="text" value="ws://localhost:3000/ws/interview?sessionId=test1&mode=default" />
+      </div>
+
+      <div class="row">
+        <button class="primary" id="connect-btn">Connect</button>
+        <button class="secondary" id="disconnect-btn" disabled>Disconnect</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Send Message</h2>
+      <div class="field">
+        <label for="message-type">Message JSON</label>
+        <textarea id="message-json">{
+  "type": "text_answer",
+  "sessionId": "test1",
+  "payload": {
+    "text": "Hello from client"
+  }
+}</textarea>
+      </div>
+
+      <div class="row">
+        <button class="primary" id="send-btn" disabled>Send Message</button>
+        <button class="secondary" id="clear-log-btn">Clear Log</button>
+      </div>
+
+      <div class="examples">
+        <p class="note">Example payloads:</p>
+        <button class="secondary" id="example-text">Text Answer</button>
+        <button class="secondary" id="example-code">Code Submission</button>
+        <button class="secondary" id="example-cancel">Cancel Turn</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Log</h2>
+      <div class="log" id="log"></div>
+    </div>
+
+    <div class="panel grid-2">
+      <div>
+        <h2>How to use</h2>
+        <ul>
+          <li>Click <strong>Connect</strong> to open the WebSocket.</li>
+          <li>Send JSON formatted messages to the server.</li>
+          <li>Watch incoming server events appear in the log.</li>
+        </ul>
+      </div>
+      <div>
+        <h2>Connection details</h2>
+        <p class="note"><strong>URL:</strong> ws://localhost:3000/ws/interview?sessionId=YOUR_SESSION_ID&tokenId=YOUR_TOKEN_ID&mode=default</p>
+        <p class="note"><strong>Client → Server types:</strong> audio_chunk, audio_end, text_answer, code_submission, cancel_turn</p>
+        <p class="note"><strong>Server → Client types:</strong> transcript_partial, transcript_final, ai_text_chunk, tts_audio_chunk, state_change</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <p class="note">If you want a Swagger-style summary, visit <a class="link" href="/api-docs" target="_blank">Swagger REST docs</a> or <a class="link" href="/asyncapi.yaml" target="_blank">AsyncAPI spec</a>.</p>
+    </div>
+  </main>
+
+  <script>
+    const connectBtn = document.getElementById('connect-btn');
+    const disconnectBtn = document.getElementById('disconnect-btn');
+    const sendBtn = document.getElementById('send-btn');
+    const clearLogBtn = document.getElementById('clear-log-btn');
+    const messageJson = document.getElementById('message-json');
+    const wsUrlInput = document.getElementById('ws-url');
+    const logEl = document.getElementById('log');
+    const statusEl = document.getElementById('connection-status');
+    const exampleText = document.getElementById('example-text');
+    const exampleCode = document.getElementById('example-code');
+    const exampleCancel = document.getElementById('example-cancel');
+
+    let ws = null;
+
+    function log(message, type = 'info') {
+      const time = new Date().toLocaleTimeString();
+      const prefix = type === 'send' ? 'SEND' : type === 'receive' ? 'RECV' : 'INFO';
+      logEl.textContent += `[${time}] ${prefix}: ${message}\n`;
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    function setConnected(connected) {
+      statusEl.textContent = connected ? 'Connected' : 'Disconnected';
+      statusEl.style.color = connected ? '#22c55e' : '#ef4444';
+      connectBtn.disabled = connected;
+      disconnectBtn.disabled = !connected;
+      sendBtn.disabled = !connected;
+    }
+
+    connectBtn.addEventListener('click', () => {
+      const url = wsUrlInput.value.trim();
+      if (!url) return;
+
+      try {
+        ws = new WebSocket(url);
+      } catch (error) {
+        log(error.message, 'error');
+        return;
+      }
+
+      ws.addEventListener('open', () => {
+        log('WebSocket connected', 'info');
+        setConnected(true);
+      });
+
+      ws.addEventListener('message', (event) => {
+        log(event.data, 'receive');
+      });
+
+      ws.addEventListener('close', () => {
+        log('WebSocket disconnected', 'info');
+        setConnected(false);
+        ws = null;
+      });
+
+      ws.addEventListener('error', (event) => {
+        log('WebSocket error: ' + (event.message || 'check console'), 'error');
+      });
+    });
+
+    disconnectBtn.addEventListener('click', () => {
+      if (ws) {
+        ws.close();
+        ws = null;
+      }
+    });
+
+    sendBtn.addEventListener('click', () => {
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        log('WebSocket is not open', 'error');
+        return;
+      }
+
+      let body = messageJson.value;
+      try {
+        const parsed = JSON.parse(body);
+        body = JSON.stringify(parsed);
+      } catch (err) {
+        log('Invalid JSON: ' + err.message, 'error');
+        return;
+      }
+
+      ws.send(body);
+      log(body, 'send');
+    });
+
+    clearLogBtn.addEventListener('click', () => {
+      logEl.textContent = '';
+    });
+
+    exampleText.addEventListener('click', () => {
+      messageJson.value = JSON.stringify({
+        type: 'text_answer',
+        sessionId: 'test1',
+        payload: { text: 'Hello from client' }
+      }, null, 2);
+    });
+
+    exampleCode.addEventListener('click', () => {
+      messageJson.value = JSON.stringify({
+        type: 'code_submission',
+        sessionId: 'test1',
+        payload: {
+          code: "console.log('hello')",
+          language: 'javascript'
+        }
+      }, null, 2);
+    });
+
+    exampleCancel.addEventListener('click', () => {
+      messageJson.value = JSON.stringify({
+        type: 'cancel_turn',
+        sessionId: 'test1'
+      }, null, 2);
+    });
+
+    setConnected(false);
+  </script>
+</body>
+</html>

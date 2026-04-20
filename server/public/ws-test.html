@@ -1,0 +1,690 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Interview Streaming Tester</title>
+    <style>
+      :root {
+        --bg: #f4f6fb;
+        --card: #ffffff;
+        --text: #0f172a;
+        --muted: #64748b;
+        --line: #dbe2ec;
+        --ok: #166534;
+        --ok-bg: #dcfce7;
+        --warn: #92400e;
+        --warn-bg: #fef3c7;
+        --primary: #0f766e;
+        --danger: #b91c1c;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        padding: 18px;
+        background: linear-gradient(160deg, #dbeafe 0%, var(--bg) 38%);
+        color: var(--text);
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        overflow-x: hidden;
+      }
+
+      .container {
+        max-width: 1100px;
+        margin: 0 auto;
+        display: grid;
+        gap: 12px;
+      }
+
+      .card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 14px;
+      }
+
+      h1,
+      h2 {
+        margin: 0 0 8px;
+      }
+
+      h1 {
+        font-size: 22px;
+      }
+
+      h2 {
+        font-size: 16px;
+      }
+
+      .row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 10px;
+      }
+
+      .three {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+        gap: 10px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      input,
+      select,
+      textarea,
+      button {
+        width: 100%;
+        border-radius: 8px;
+        border: 1px solid var(--line);
+        padding: 9px;
+        font-size: 14px;
+      }
+
+      textarea {
+        min-height: 90px;
+        resize: vertical;
+      }
+
+      .actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 8px;
+      }
+
+      button {
+        border: none;
+        color: #fff;
+        background: var(--primary);
+        cursor: pointer;
+      }
+
+      button.danger {
+        background: var(--danger);
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 8px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .pill.ok {
+        color: var(--ok);
+        background: var(--ok-bg);
+      }
+
+      .pill.warn {
+        color: var(--warn);
+        background: var(--warn-bg);
+      }
+
+      .box {
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 10px;
+        min-height: 170px;
+      }
+
+      .content {
+        white-space: pre-wrap;
+        word-break: break-word;
+        line-height: 1.45;
+      }
+
+      .log {
+        background: #0b1220;
+        color: #e2e8f0;
+        border-radius: 10px;
+        min-height: 180px;
+        max-height: 240px;
+        overflow: auto;
+        padding: 10px;
+        font-family: Consolas, Menlo, Monaco, monospace;
+        font-size: 12px;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <section class="card">
+        <h1>Interview Pipeline Tester</h1>
+        <div class="row">
+          <div>
+            <label for="wsUrl">WebSocket URL</label>
+            <input id="wsUrl" value="ws://localhost:3000/ws/interview" />
+          </div>
+          <div>
+            <label for="sessionId">Session ID</label>
+            <input id="sessionId" value="session-test-001" />
+          </div>
+          <div>
+            <label for="mode">Mode</label>
+            <select id="mode">
+              <option value="default">default</option>
+              <option value="coding">coding</option>
+            </select>
+          </div>
+        </div>
+        <div class="actions" style="margin-top: 8px">
+          <button id="connectBtn">Connect</button>
+          <button id="disconnectBtn" class="danger">Disconnect</button>
+          <button id="cancelTurnBtn" class="danger">Cancel Turn</button>
+          <button id="clearBtn">Clear Outputs</button>
+        </div>
+        <div style="margin-top: 8px">
+          <label style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text)">
+            <input id="autoPlayTts" type="checkbox" checked style="width: auto" />
+            Auto-play generated TTS
+          </label>
+        </div>
+        <div style="margin-top: 10px">
+          <span id="connectionPill" class="pill warn">Disconnected</span>
+          <span id="statePill" class="pill warn" style="margin-left: 6px">State: -</span>
+          <span id="turnPill" class="pill warn" style="margin-left: 6px">Turn: -</span>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Send Input</h2>
+        <div class="row">
+          <div>
+            <label for="audioText">Microphone Input</label>
+            <textarea id="audioText" readonly>Click Start Recording, speak your answer, then click Stop Recording.</textarea>
+            <div class="actions" style="margin-top: 8px">
+              <button id="streamAudioBtn">Start Recording</button>
+              <button id="audioEndBtn" disabled>Stop Recording</button>
+            </div>
+          </div>
+          <div>
+            <label for="textAnswer">Direct text_answer</label>
+            <textarea id="textAnswer">I built a queue worker that retries transient failures with exponential backoff.</textarea>
+            <button id="sendTextBtn" style="margin-top: 8px">Send text_answer</button>
+          </div>
+          <div>
+            <label for="codeInput">code_submission (coding mode)</label>
+            <textarea id="codeInput">function twoSum(nums, target) {\n  const map = new Map();\n  for (let i = 0; i < nums.length; i += 1) {\n    const need = target - nums[i];\n    if (map.has(need)) return [map.get(need), i];\n    map.set(nums[i], i);\n  }\n  return [];\n}</textarea>
+            <button id="sendCodeBtn" style="margin-top: 8px">Send code_submission</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Streaming Output</h2>
+        <div class="three">
+          <div class="box">
+            <strong>STT Transcript</strong>
+            <div style="font-size: 12px; color: var(--muted)">partial + final</div>
+            <div id="sttOut" class="content" style="margin-top: 6px"></div>
+          </div>
+          <div class="box">
+            <strong>LLM Stream</strong>
+            <div style="font-size: 12px; color: var(--muted)">ai_text_chunk</div>
+            <div id="llmOut" class="content" style="margin-top: 6px"></div>
+          </div>
+          <div class="box">
+            <strong>TTS Stream (audio)</strong>
+            <div style="font-size: 12px; color: var(--muted)">tts_audio_chunk base64 -> playable audio</div>
+            <div id="ttsOut" class="content" style="margin-top: 6px"></div>
+            <audio id="ttsPlayer" controls style="margin-top: 8px; width: 100%"></audio>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Event Log</h2>
+        <div id="eventLog" class="log"></div>
+      </section>
+    </div>
+
+    <script>
+      let ws = null;
+      let currentTurnId = null;
+      let sttPartial = "";
+      let sttFinal = "";
+      let llmText = "";
+      let ttsDecoded = "";
+      let ttsChunks = [];
+      let ttsMimeType = "audio/mpeg";
+      let sentAudioChunks = 0;
+      let totalSentAudioChunks = 0;
+      let micStream = null;
+      let audioContext = null;
+      let sourceNode = null;
+      let processorNode = null;
+      let isRecording = false;
+
+      const eventLogEl = document.getElementById("eventLog");
+      const sttEl = document.getElementById("sttOut");
+      const llmEl = document.getElementById("llmOut");
+      const ttsEl = document.getElementById("ttsOut");
+      const ttsPlayer = document.getElementById("ttsPlayer");
+      const connectionPill = document.getElementById("connectionPill");
+      const statePill = document.getElementById("statePill");
+      const turnPill = document.getElementById("turnPill");
+      const streamAudioBtn = document.getElementById("streamAudioBtn");
+      const audioEndBtn = document.getElementById("audioEndBtn");
+      const autoPlayTtsEl = document.getElementById("autoPlayTts");
+
+      function now() {
+        return new Date().toLocaleTimeString();
+      }
+
+      function sanitizeForLog(obj) {
+        if (!obj || typeof obj !== "object") {
+          return obj;
+        }
+
+        const clone = JSON.parse(JSON.stringify(obj));
+        if (clone.audio && typeof clone.audio === "string") {
+          const len = clone.audio.length;
+          clone.audio = `<base64:${len} chars>`;
+        }
+        if (clone.payload && typeof clone.payload === "object") {
+          if (clone.payload.audio && typeof clone.payload.audio === "string") {
+            const len = clone.payload.audio.length;
+            clone.payload.audio = `<base64:${len} chars>`;
+          }
+        }
+        return clone;
+      }
+
+      function log(line, obj) {
+        const row = document.createElement("div");
+        const safeObj = sanitizeForLog(obj);
+        row.textContent = `[${now()}] ${line}${safeObj ? ` ${JSON.stringify(safeObj)}` : ""}`;
+        eventLogEl.appendChild(row);
+        eventLogEl.scrollTop = eventLogEl.scrollHeight;
+      }
+
+      function renderOutputs() {
+        sttEl.textContent = `Partial: ${sttPartial}\n\nFinal: ${sttFinal}\n\nSent audio chunks (this turn): ${sentAudioChunks}\nTotal sent audio chunks: ${totalSentAudioChunks}`;
+        llmEl.textContent = llmText;
+        ttsEl.textContent = ttsDecoded;
+      }
+
+      function clearOutputs() {
+        sttPartial = "";
+        sttFinal = "";
+        llmText = "";
+        ttsDecoded = "";
+        ttsChunks = [];
+        ttsMimeType = "audio/mpeg";
+        sentAudioChunks = 0;
+        totalSentAudioChunks = 0;
+        ttsPlayer.src = "";
+        ttsPlayer.pause();
+        renderOutputs();
+        eventLogEl.innerHTML = "";
+      }
+
+      function setConnectionStatus(connected) {
+        if (connected) {
+          connectionPill.textContent = "Connected";
+          connectionPill.className = "pill ok";
+          return;
+        }
+        connectionPill.textContent = "Disconnected";
+        connectionPill.className = "pill warn";
+      }
+
+      function resetTurn(turnId) {
+        currentTurnId = turnId;
+        turnPill.textContent = `Turn: ${turnId || "-"}`;
+        turnPill.className = turnId ? "pill ok" : "pill warn";
+        sttPartial = "";
+        sttFinal = "";
+        llmText = "";
+        ttsDecoded = "";
+        ttsChunks = [];
+        ttsMimeType = "audio/mpeg";
+        if (ttsPlayer) {
+          ttsPlayer.src = "";
+          ttsPlayer.pause();
+        }
+        renderOutputs();
+      }
+
+      function getWsUrl() {
+        const base = document.getElementById("wsUrl").value.trim();
+        const sessionId = encodeURIComponent(document.getElementById("sessionId").value.trim());
+        const mode = encodeURIComponent(document.getElementById("mode").value.trim());
+        return `${base}?sessionId=${sessionId}&mode=${mode}`;
+      }
+
+      function sendMessage(type, payload = {}) {
+        if (!ws || ws.readyState !== WebSocket.OPEN) {
+          log("Cannot send; socket disconnected.");
+          return;
+        }
+        const sessionId = document.getElementById("sessionId").value.trim();
+        const mode = document.getElementById("mode").value.trim();
+        ws.send(JSON.stringify({ type, sessionId, mode, payload }));
+        if (type !== "audio_chunk") {
+          log(`Sent -> ${type}`, payload);
+        }
+      }
+
+      function decodeTtsBase64(b64) {
+        try {
+          return atob(b64);
+        } catch (_error) {
+          return "";
+        }
+      }
+
+      function decodeTtsToBytes(base64Text) {
+        try {
+          const binary = atob(base64Text);
+          const bytes = new Uint8Array(binary.length);
+          for (let i = 0; i < binary.length; i += 1) {
+            bytes[i] = binary.charCodeAt(i);
+          }
+          return bytes;
+        } catch (_error) {
+          return null;
+        }
+      }
+
+      function floatTo16BitPCM(float32Array) {
+        const buffer = new ArrayBuffer(float32Array.length * 2);
+        const view = new DataView(buffer);
+        let offset = 0;
+        for (let i = 0; i < float32Array.length; i += 1) {
+          let sample = Math.max(-1, Math.min(1, float32Array[i]));
+          sample = sample < 0 ? sample * 0x8000 : sample * 0x7fff;
+          view.setInt16(offset, sample, true);
+          offset += 2;
+        }
+        return new Uint8Array(buffer);
+      }
+
+      function downsampleFloat32(floatArray, inputRate, outputRate) {
+        if (outputRate >= inputRate) {
+          return floatArray;
+        }
+        const ratio = inputRate / outputRate;
+        const newLength = Math.round(floatArray.length / ratio);
+        const result = new Float32Array(newLength);
+        let offsetResult = 0;
+        let offsetBuffer = 0;
+        while (offsetResult < result.length) {
+          const nextOffsetBuffer = Math.round((offsetResult + 1) * ratio);
+          let accum = 0;
+          let count = 0;
+          for (let i = offsetBuffer; i < nextOffsetBuffer && i < floatArray.length; i += 1) {
+            accum += floatArray[i];
+            count += 1;
+          }
+          result[offsetResult] = count > 0 ? accum / count : 0;
+          offsetResult += 1;
+          offsetBuffer = nextOffsetBuffer;
+        }
+        return result;
+      }
+
+      function bytesToBase64(bytes) {
+        let binary = "";
+        for (let i = 0; i < bytes.length; i += 1) {
+          binary += String.fromCharCode(bytes[i]);
+        }
+        return btoa(binary);
+      }
+
+      function playNextTtsSegment() {
+        if (!ttsChunks.length) {
+          return;
+        }
+        const blob = new Blob(ttsChunks, { type: ttsMimeType || "audio/mpeg" });
+        const blobUrl = URL.createObjectURL(blob);
+        ttsPlayer.src = blobUrl;
+        if (autoPlayTtsEl.checked) {
+          ttsPlayer.play().catch(() => {
+            log("TTS ready. Click play if browser blocked autoplay.");
+          });
+        }
+      }
+
+      function maybeSwitchTurn(turnId) {
+        if (!turnId) {
+          return;
+        }
+        if (!currentTurnId) {
+          resetTurn(turnId);
+          return;
+        }
+        if (turnId !== currentTurnId) {
+          resetTurn(turnId);
+        }
+      }
+
+      async function startMicRecording() {
+        if (isRecording) {
+          return;
+        }
+        if (!ws || ws.readyState !== WebSocket.OPEN) {
+          log("Connect websocket before recording.");
+          return;
+        }
+
+        try {
+          micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          audioContext = new AudioContext({ sampleRate: 16000 });
+          sourceNode = audioContext.createMediaStreamSource(micStream);
+          processorNode = audioContext.createScriptProcessor(4096, 1, 1);
+
+          processorNode.onaudioprocess = (event) => {
+            if (!isRecording) {
+              return;
+            }
+            const floatData = event.inputBuffer.getChannelData(0);
+            const inputRate = audioContext.sampleRate || 48000;
+            const targetRate = 16000;
+            const downsampled = downsampleFloat32(floatData, inputRate, targetRate);
+            const pcmBytes = floatTo16BitPCM(downsampled);
+            sendMessage("audio_chunk", {
+              audio: bytesToBase64(pcmBytes),
+              sampleRate: targetRate,
+              encoding: "pcm_s16le",
+            });
+            sentAudioChunks += 1;
+            totalSentAudioChunks += 1;
+            if (sentAudioChunks % 10 === 0) {
+              renderOutputs();
+            }
+          };
+
+          sourceNode.connect(processorNode);
+          processorNode.connect(audioContext.destination);
+
+          isRecording = true;
+          streamAudioBtn._collectedFrames = [];
+          streamAudioBtn.disabled = true;
+          streamAudioBtn.textContent = "Recording...";
+          audioEndBtn.disabled = false;
+          log("Mic recording started.");
+        } catch (error) {
+          log("Microphone permission/setup failed.", { error: error.message });
+          await stopMicRecording(false);
+        }
+      }
+
+      async function stopMicRecording(sendEndSignal = true) {
+        if (!isRecording && !micStream) {
+          return;
+        }
+
+        isRecording = false;
+
+        if (processorNode) {
+          processorNode.disconnect();
+          processorNode.onaudioprocess = null;
+          processorNode = null;
+        }
+
+        if (sourceNode) {
+          sourceNode.disconnect();
+          sourceNode = null;
+        }
+
+        if (micStream) {
+          micStream.getTracks().forEach((track) => track.stop());
+          micStream = null;
+        }
+
+        if (audioContext) {
+          await audioContext.close();
+          audioContext = null;
+        }
+        streamAudioBtn._collectedFrames = [];
+
+          streamAudioBtn.disabled = false;
+          streamAudioBtn.textContent = "Start Recording";
+          audioEndBtn.disabled = true;
+          renderOutputs();
+
+        if (sendEndSignal) {
+          sendMessage("audio_end", {});
+          log("Mic recording stopped and audio_end sent.");
+        } else {
+          log("Mic recording stopped.");
+        }
+      }
+
+      document.getElementById("connectBtn").addEventListener("click", () => {
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          log("Already connected.");
+          return;
+        }
+
+        ws = new WebSocket(getWsUrl());
+        setConnectionStatus(false);
+        log("Connecting...");
+
+        ws.addEventListener("open", () => {
+          setConnectionStatus(true);
+          log("WebSocket connected.");
+        });
+
+        ws.addEventListener("close", (event) => {
+          setConnectionStatus(false);
+          log("WebSocket closed.", { code: event.code, reason: event.reason });
+        });
+
+        ws.addEventListener("error", () => {
+          setConnectionStatus(false);
+          log("WebSocket error.");
+        });
+
+        ws.addEventListener("message", (event) => {
+          let msg = null;
+          try {
+            msg = JSON.parse(event.data);
+          } catch (_error) {
+            log("Received non-JSON message.", { raw: event.data });
+            return;
+          }
+
+          const type = msg.type;
+          const payload = msg.payload || {};
+          const turnId = msg.turnId || payload.turnId || null;
+
+          maybeSwitchTurn(turnId);
+
+          if (type === "state_change") {
+            statePill.textContent = `State: ${payload.state || "-"}`;
+            statePill.className = payload.state === "LISTENING" ? "pill ok" : "pill warn";
+            if (payload.state === "LISTENING") {
+              playNextTtsSegment();
+            }
+          }
+
+          if (type === "transcript_partial") {
+            sttPartial = payload.transcript || "";
+            renderOutputs();
+          }
+
+          if (type === "transcript_final") {
+            sttFinal = payload.transcript || "";
+            renderOutputs();
+          }
+
+          if (type === "ai_text_chunk") {
+            llmText += payload.text || "";
+            renderOutputs();
+          }
+
+          if (type === "tts_audio_chunk") {
+            ttsMimeType = payload.contentType || "audio/mpeg";
+            const bytes = decodeTtsToBytes(payload.audio || "");
+            if (bytes) {
+              ttsChunks.push(bytes);
+            }
+            ttsDecoded = `[audio chunks: ${ttsChunks.length}]`;
+            const maybeText = decodeTtsBase64(payload.audio || "");
+            if (maybeText && maybeText.startsWith("TTS:")) {
+              ttsDecoded += maybeText.replace(/^TTS:/, "");
+            }
+            renderOutputs();
+          }
+
+          log(`Recv <- ${type}`, { turnId, payload });
+        });
+      });
+
+      document.getElementById("disconnectBtn").addEventListener("click", async () => {
+        await stopMicRecording(false);
+        if (ws) {
+          ws.close();
+        }
+      });
+
+      document.getElementById("cancelTurnBtn").addEventListener("click", () => {
+        sendMessage("cancel_turn", {});
+      });
+
+      document.getElementById("clearBtn").addEventListener("click", () => {
+        clearOutputs();
+      });
+
+      document.getElementById("sendTextBtn").addEventListener("click", () => {
+        resetTurn(null);
+        sendMessage("text_answer", {
+          text: document.getElementById("textAnswer").value,
+        });
+      });
+
+      document.getElementById("sendCodeBtn").addEventListener("click", () => {
+        resetTurn(null);
+        sendMessage("code_submission", {
+          code: document.getElementById("codeInput").value,
+        });
+      });
+
+      audioEndBtn.addEventListener("click", async () => {
+        await stopMicRecording(true);
+      });
+
+      streamAudioBtn.addEventListener("click", async () => {
+        resetTurn(null);
+        sentAudioChunks = 0;
+        await startMicRecording();
+      });
+
+    </script>
+  </body>
+</html>

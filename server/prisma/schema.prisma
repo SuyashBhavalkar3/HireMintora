@@ -1,0 +1,66 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma-client"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ─────────────────────────────────────────────
+// User (HR / Employer Account)
+// Supports two auth methods:
+//   1. Manual  — email + hashed password
+//   2. OAuth   — Supabase OAuth (Google, GitHub, etc.)
+// A user may link both (e.g., signed up via OAuth,
+// later added a password). The email is always the
+// canonical unique identifier.
+// ─────────────────────────────────────────────
+model User {
+  id             String   @id @default(uuid())
+  fullName       String
+  email          String   @unique
+
+  // Manual auth — nullable so OAuth-only users skip it
+  passwordHash   String?
+
+  // Supabase OAuth — nullable for manual-only users
+  supabaseUserId String?  @unique
+  oauthProvider  String?  // e.g. "google", "github"
+
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  // Organisation Link
+  organisationId      String?
+  organisation        Organisation? @relation(fields: [organisationId], references: [id])
+  organisationRole    String?  // 'OWNER' | 'MEMBER'
+
+  @@map("users")
+}
+
+// ─────────────────────────────────────────────
+// Organisation (Workspace / Business Entity)
+// An HR User can create or join an organisation.
+// ─────────────────────────────────────────────
+model Organisation {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  category    String   // e.g. "Startup", "Enterprise", "Educational Institute", "Other"
+  orgCode     String   @unique
+
+  // Relations
+  members     User[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("organisations")
+}
