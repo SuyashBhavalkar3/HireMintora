@@ -58,9 +58,29 @@ model Organisation {
 
   // Relations
   members     User[]
+  drives      HiringDrive[]
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   @@map("organisations")
+}
+
+// ─────────────────────────────────────────────
+// Hiring Drive
+// An organisation can create hiring drives for roles.
+// ─────────────────────────────────────────────
+model HiringDrive {
+  id             String   @id @default(uuid())
+  role           String
+  description    String?
+  isActive       Boolean  @default(true)
+  
+  organisationId String
+  organisation   Organisation @relation(fields: [organisationId], references: [id])
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("hiring_drives")
 }

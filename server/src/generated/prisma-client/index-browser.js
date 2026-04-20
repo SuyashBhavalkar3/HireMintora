@@ -145,6 +145,16 @@ exports.Prisma.OrganisationScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.HiringDriveScalarFieldEnum = {
+  id: 'id',
+  role: 'role',
+  description: 'description',
+  isActive: 'isActive',
+  organisationId: 'organisationId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -163,7 +173,8 @@ exports.Prisma.NullsOrder = {
 
 exports.Prisma.ModelName = {
   User: 'User',
-  Organisation: 'Organisation'
+  Organisation: 'Organisation',
+  HiringDrive: 'HiringDrive'
 };
 
 /**

@@ -23,6 +23,11 @@ export type User = $Result.DefaultSelection<Prisma.$UserPayload>
  * 
  */
 export type Organisation = $Result.DefaultSelection<Prisma.$OrganisationPayload>
+/**
+ * Model HiringDrive
+ * 
+ */
+export type HiringDrive = $Result.DefaultSelection<Prisma.$HiringDrivePayload>
 
 /**
  * ##  Prisma Client ʲˢ
@@ -161,6 +166,16 @@ export class PrismaClient<
     * ```
     */
   get organisation(): Prisma.OrganisationDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.hiringDrive`: Exposes CRUD operations for the **HiringDrive** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more HiringDrives
+    * const hiringDrives = await prisma.hiringDrive.findMany()
+    * ```
+    */
+  get hiringDrive(): Prisma.HiringDriveDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -603,7 +618,8 @@ export namespace Prisma {
 
   export const ModelName: {
     User: 'User',
-    Organisation: 'Organisation'
+    Organisation: 'Organisation',
+    HiringDrive: 'HiringDrive'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -622,7 +638,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "organisation"
+      modelProps: "user" | "organisation" | "hiringDrive"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -774,6 +790,80 @@ export namespace Prisma {
           }
         }
       }
+      HiringDrive: {
+        payload: Prisma.$HiringDrivePayload<ExtArgs>
+        fields: Prisma.HiringDriveFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.HiringDriveFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HiringDrivePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.HiringDriveFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HiringDrivePayload>
+          }
+          findFirst: {
+            args: Prisma.HiringDriveFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HiringDrivePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.HiringDriveFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HiringDrivePayload>
+          }
+          findMany: {
+            args: Prisma.HiringDriveFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HiringDrivePayload>[]
+          }
+          create: {
+            args: Prisma.HiringDriveCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HiringDrivePayload>
+          }
+          createMany: {
+            args: Prisma.HiringDriveCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.HiringDriveCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HiringDrivePayload>[]
+          }
+          delete: {
+            args: Prisma.HiringDriveDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HiringDrivePayload>
+          }
+          update: {
+            args: Prisma.HiringDriveUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HiringDrivePayload>
+          }
+          deleteMany: {
+            args: Prisma.HiringDriveDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.HiringDriveUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.HiringDriveUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HiringDrivePayload>[]
+          }
+          upsert: {
+            args: Prisma.HiringDriveUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HiringDrivePayload>
+          }
+          aggregate: {
+            args: Prisma.HiringDriveAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateHiringDrive>
+          }
+          groupBy: {
+            args: Prisma.HiringDriveGroupByArgs<ExtArgs>
+            result: $Utils.Optional<HiringDriveGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.HiringDriveCountArgs<ExtArgs>
+            result: $Utils.Optional<HiringDriveCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -872,6 +962,7 @@ export namespace Prisma {
   export type GlobalOmitConfig = {
     user?: UserOmit
     organisation?: OrganisationOmit
+    hiringDrive?: HiringDriveOmit
   }
 
   /* Types for Logging */
@@ -953,10 +1044,12 @@ export namespace Prisma {
 
   export type OrganisationCountOutputType = {
     members: number
+    drives: number
   }
 
   export type OrganisationCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     members?: boolean | OrganisationCountOutputTypeCountMembersArgs
+    drives?: boolean | OrganisationCountOutputTypeCountDrivesArgs
   }
 
   // Custom InputTypes
@@ -975,6 +1068,13 @@ export namespace Prisma {
    */
   export type OrganisationCountOutputTypeCountMembersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: UserWhereInput
+  }
+
+  /**
+   * OrganisationCountOutputType without action
+   */
+  export type OrganisationCountOutputTypeCountDrivesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: HiringDriveWhereInput
   }
 
 
@@ -2318,6 +2418,7 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     members?: boolean | Organisation$membersArgs<ExtArgs>
+    drives?: boolean | Organisation$drivesArgs<ExtArgs>
     _count?: boolean | OrganisationCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["organisation"]>
 
@@ -2354,6 +2455,7 @@ export namespace Prisma {
   export type OrganisationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "description" | "category" | "orgCode" | "createdAt" | "updatedAt", ExtArgs["result"]["organisation"]>
   export type OrganisationInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     members?: boolean | Organisation$membersArgs<ExtArgs>
+    drives?: boolean | Organisation$drivesArgs<ExtArgs>
     _count?: boolean | OrganisationCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type OrganisationIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -2363,6 +2465,7 @@ export namespace Prisma {
     name: "Organisation"
     objects: {
       members: Prisma.$UserPayload<ExtArgs>[]
+      drives: Prisma.$HiringDrivePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -2767,6 +2870,7 @@ export namespace Prisma {
   export interface Prisma__OrganisationClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     members<T extends Organisation$membersArgs<ExtArgs> = {}>(args?: Subset<T, Organisation$membersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    drives<T extends Organisation$drivesArgs<ExtArgs> = {}>(args?: Subset<T, Organisation$drivesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$HiringDrivePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3215,6 +3319,30 @@ export namespace Prisma {
   }
 
   /**
+   * Organisation.drives
+   */
+  export type Organisation$drivesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HiringDrive
+     */
+    select?: HiringDriveSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HiringDrive
+     */
+    omit?: HiringDriveOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HiringDriveInclude<ExtArgs> | null
+    where?: HiringDriveWhereInput
+    orderBy?: HiringDriveOrderByWithRelationInput | HiringDriveOrderByWithRelationInput[]
+    cursor?: HiringDriveWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: HiringDriveScalarFieldEnum | HiringDriveScalarFieldEnum[]
+  }
+
+  /**
    * Organisation without action
    */
   export type OrganisationDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3230,6 +3358,1090 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: OrganisationInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model HiringDrive
+   */
+
+  export type AggregateHiringDrive = {
+    _count: HiringDriveCountAggregateOutputType | null
+    _min: HiringDriveMinAggregateOutputType | null
+    _max: HiringDriveMaxAggregateOutputType | null
+  }
+
+  export type HiringDriveMinAggregateOutputType = {
+    id: string | null
+    role: string | null
+    description: string | null
+    isActive: boolean | null
+    organisationId: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type HiringDriveMaxAggregateOutputType = {
+    id: string | null
+    role: string | null
+    description: string | null
+    isActive: boolean | null
+    organisationId: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type HiringDriveCountAggregateOutputType = {
+    id: number
+    role: number
+    description: number
+    isActive: number
+    organisationId: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type HiringDriveMinAggregateInputType = {
+    id?: true
+    role?: true
+    description?: true
+    isActive?: true
+    organisationId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type HiringDriveMaxAggregateInputType = {
+    id?: true
+    role?: true
+    description?: true
+    isActive?: true
+    organisationId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type HiringDriveCountAggregateInputType = {
+    id?: true
+    role?: true
+    description?: true
+    isActive?: true
+    organisationId?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type HiringDriveAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which HiringDrive to aggregate.
+     */
+    where?: HiringDriveWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of HiringDrives to fetch.
+     */
+    orderBy?: HiringDriveOrderByWithRelationInput | HiringDriveOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: HiringDriveWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` HiringDrives from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` HiringDrives.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned HiringDrives
+    **/
+    _count?: true | HiringDriveCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: HiringDriveMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: HiringDriveMaxAggregateInputType
+  }
+
+  export type GetHiringDriveAggregateType<T extends HiringDriveAggregateArgs> = {
+        [P in keyof T & keyof AggregateHiringDrive]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateHiringDrive[P]>
+      : GetScalarType<T[P], AggregateHiringDrive[P]>
+  }
+
+
+
+
+  export type HiringDriveGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: HiringDriveWhereInput
+    orderBy?: HiringDriveOrderByWithAggregationInput | HiringDriveOrderByWithAggregationInput[]
+    by: HiringDriveScalarFieldEnum[] | HiringDriveScalarFieldEnum
+    having?: HiringDriveScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: HiringDriveCountAggregateInputType | true
+    _min?: HiringDriveMinAggregateInputType
+    _max?: HiringDriveMaxAggregateInputType
+  }
+
+  export type HiringDriveGroupByOutputType = {
+    id: string
+    role: string
+    description: string | null
+    isActive: boolean
+    organisationId: string
+    createdAt: Date
+    updatedAt: Date
+    _count: HiringDriveCountAggregateOutputType | null
+    _min: HiringDriveMinAggregateOutputType | null
+    _max: HiringDriveMaxAggregateOutputType | null
+  }
+
+  type GetHiringDriveGroupByPayload<T extends HiringDriveGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<HiringDriveGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof HiringDriveGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], HiringDriveGroupByOutputType[P]>
+            : GetScalarType<T[P], HiringDriveGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type HiringDriveSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    role?: boolean
+    description?: boolean
+    isActive?: boolean
+    organisationId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    organisation?: boolean | OrganisationDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["hiringDrive"]>
+
+  export type HiringDriveSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    role?: boolean
+    description?: boolean
+    isActive?: boolean
+    organisationId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    organisation?: boolean | OrganisationDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["hiringDrive"]>
+
+  export type HiringDriveSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    role?: boolean
+    description?: boolean
+    isActive?: boolean
+    organisationId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    organisation?: boolean | OrganisationDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["hiringDrive"]>
+
+  export type HiringDriveSelectScalar = {
+    id?: boolean
+    role?: boolean
+    description?: boolean
+    isActive?: boolean
+    organisationId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type HiringDriveOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "role" | "description" | "isActive" | "organisationId" | "createdAt" | "updatedAt", ExtArgs["result"]["hiringDrive"]>
+  export type HiringDriveInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    organisation?: boolean | OrganisationDefaultArgs<ExtArgs>
+  }
+  export type HiringDriveIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    organisation?: boolean | OrganisationDefaultArgs<ExtArgs>
+  }
+  export type HiringDriveIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    organisation?: boolean | OrganisationDefaultArgs<ExtArgs>
+  }
+
+  export type $HiringDrivePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "HiringDrive"
+    objects: {
+      organisation: Prisma.$OrganisationPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      role: string
+      description: string | null
+      isActive: boolean
+      organisationId: string
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["hiringDrive"]>
+    composites: {}
+  }
+
+  type HiringDriveGetPayload<S extends boolean | null | undefined | HiringDriveDefaultArgs> = $Result.GetResult<Prisma.$HiringDrivePayload, S>
+
+  type HiringDriveCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<HiringDriveFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: HiringDriveCountAggregateInputType | true
+    }
+
+  export interface HiringDriveDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['HiringDrive'], meta: { name: 'HiringDrive' } }
+    /**
+     * Find zero or one HiringDrive that matches the filter.
+     * @param {HiringDriveFindUniqueArgs} args - Arguments to find a HiringDrive
+     * @example
+     * // Get one HiringDrive
+     * const hiringDrive = await prisma.hiringDrive.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends HiringDriveFindUniqueArgs>(args: SelectSubset<T, HiringDriveFindUniqueArgs<ExtArgs>>): Prisma__HiringDriveClient<$Result.GetResult<Prisma.$HiringDrivePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one HiringDrive that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {HiringDriveFindUniqueOrThrowArgs} args - Arguments to find a HiringDrive
+     * @example
+     * // Get one HiringDrive
+     * const hiringDrive = await prisma.hiringDrive.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends HiringDriveFindUniqueOrThrowArgs>(args: SelectSubset<T, HiringDriveFindUniqueOrThrowArgs<ExtArgs>>): Prisma__HiringDriveClient<$Result.GetResult<Prisma.$HiringDrivePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first HiringDrive that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HiringDriveFindFirstArgs} args - Arguments to find a HiringDrive
+     * @example
+     * // Get one HiringDrive
+     * const hiringDrive = await prisma.hiringDrive.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends HiringDriveFindFirstArgs>(args?: SelectSubset<T, HiringDriveFindFirstArgs<ExtArgs>>): Prisma__HiringDriveClient<$Result.GetResult<Prisma.$HiringDrivePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first HiringDrive that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HiringDriveFindFirstOrThrowArgs} args - Arguments to find a HiringDrive
+     * @example
+     * // Get one HiringDrive
+     * const hiringDrive = await prisma.hiringDrive.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends HiringDriveFindFirstOrThrowArgs>(args?: SelectSubset<T, HiringDriveFindFirstOrThrowArgs<ExtArgs>>): Prisma__HiringDriveClient<$Result.GetResult<Prisma.$HiringDrivePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more HiringDrives that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HiringDriveFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all HiringDrives
+     * const hiringDrives = await prisma.hiringDrive.findMany()
+     * 
+     * // Get first 10 HiringDrives
+     * const hiringDrives = await prisma.hiringDrive.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const hiringDriveWithIdOnly = await prisma.hiringDrive.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends HiringDriveFindManyArgs>(args?: SelectSubset<T, HiringDriveFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$HiringDrivePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a HiringDrive.
+     * @param {HiringDriveCreateArgs} args - Arguments to create a HiringDrive.
+     * @example
+     * // Create one HiringDrive
+     * const HiringDrive = await prisma.hiringDrive.create({
+     *   data: {
+     *     // ... data to create a HiringDrive
+     *   }
+     * })
+     * 
+     */
+    create<T extends HiringDriveCreateArgs>(args: SelectSubset<T, HiringDriveCreateArgs<ExtArgs>>): Prisma__HiringDriveClient<$Result.GetResult<Prisma.$HiringDrivePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many HiringDrives.
+     * @param {HiringDriveCreateManyArgs} args - Arguments to create many HiringDrives.
+     * @example
+     * // Create many HiringDrives
+     * const hiringDrive = await prisma.hiringDrive.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends HiringDriveCreateManyArgs>(args?: SelectSubset<T, HiringDriveCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many HiringDrives and returns the data saved in the database.
+     * @param {HiringDriveCreateManyAndReturnArgs} args - Arguments to create many HiringDrives.
+     * @example
+     * // Create many HiringDrives
+     * const hiringDrive = await prisma.hiringDrive.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many HiringDrives and only return the `id`
+     * const hiringDriveWithIdOnly = await prisma.hiringDrive.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends HiringDriveCreateManyAndReturnArgs>(args?: SelectSubset<T, HiringDriveCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$HiringDrivePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a HiringDrive.
+     * @param {HiringDriveDeleteArgs} args - Arguments to delete one HiringDrive.
+     * @example
+     * // Delete one HiringDrive
+     * const HiringDrive = await prisma.hiringDrive.delete({
+     *   where: {
+     *     // ... filter to delete one HiringDrive
+     *   }
+     * })
+     * 
+     */
+    delete<T extends HiringDriveDeleteArgs>(args: SelectSubset<T, HiringDriveDeleteArgs<ExtArgs>>): Prisma__HiringDriveClient<$Result.GetResult<Prisma.$HiringDrivePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one HiringDrive.
+     * @param {HiringDriveUpdateArgs} args - Arguments to update one HiringDrive.
+     * @example
+     * // Update one HiringDrive
+     * const hiringDrive = await prisma.hiringDrive.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends HiringDriveUpdateArgs>(args: SelectSubset<T, HiringDriveUpdateArgs<ExtArgs>>): Prisma__HiringDriveClient<$Result.GetResult<Prisma.$HiringDrivePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more HiringDrives.
+     * @param {HiringDriveDeleteManyArgs} args - Arguments to filter HiringDrives to delete.
+     * @example
+     * // Delete a few HiringDrives
+     * const { count } = await prisma.hiringDrive.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends HiringDriveDeleteManyArgs>(args?: SelectSubset<T, HiringDriveDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more HiringDrives.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HiringDriveUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many HiringDrives
+     * const hiringDrive = await prisma.hiringDrive.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends HiringDriveUpdateManyArgs>(args: SelectSubset<T, HiringDriveUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more HiringDrives and returns the data updated in the database.
+     * @param {HiringDriveUpdateManyAndReturnArgs} args - Arguments to update many HiringDrives.
+     * @example
+     * // Update many HiringDrives
+     * const hiringDrive = await prisma.hiringDrive.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more HiringDrives and only return the `id`
+     * const hiringDriveWithIdOnly = await prisma.hiringDrive.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends HiringDriveUpdateManyAndReturnArgs>(args: SelectSubset<T, HiringDriveUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$HiringDrivePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one HiringDrive.
+     * @param {HiringDriveUpsertArgs} args - Arguments to update or create a HiringDrive.
+     * @example
+     * // Update or create a HiringDrive
+     * const hiringDrive = await prisma.hiringDrive.upsert({
+     *   create: {
+     *     // ... data to create a HiringDrive
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the HiringDrive we want to update
+     *   }
+     * })
+     */
+    upsert<T extends HiringDriveUpsertArgs>(args: SelectSubset<T, HiringDriveUpsertArgs<ExtArgs>>): Prisma__HiringDriveClient<$Result.GetResult<Prisma.$HiringDrivePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of HiringDrives.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HiringDriveCountArgs} args - Arguments to filter HiringDrives to count.
+     * @example
+     * // Count the number of HiringDrives
+     * const count = await prisma.hiringDrive.count({
+     *   where: {
+     *     // ... the filter for the HiringDrives we want to count
+     *   }
+     * })
+    **/
+    count<T extends HiringDriveCountArgs>(
+      args?: Subset<T, HiringDriveCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], HiringDriveCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a HiringDrive.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HiringDriveAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends HiringDriveAggregateArgs>(args: Subset<T, HiringDriveAggregateArgs>): Prisma.PrismaPromise<GetHiringDriveAggregateType<T>>
+
+    /**
+     * Group by HiringDrive.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HiringDriveGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends HiringDriveGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: HiringDriveGroupByArgs['orderBy'] }
+        : { orderBy?: HiringDriveGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, HiringDriveGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetHiringDriveGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the HiringDrive model
+   */
+  readonly fields: HiringDriveFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for HiringDrive.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__HiringDriveClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    organisation<T extends OrganisationDefaultArgs<ExtArgs> = {}>(args?: Subset<T, OrganisationDefaultArgs<ExtArgs>>): Prisma__OrganisationClient<$Result.GetResult<Prisma.$OrganisationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the HiringDrive model
+   */
+  interface HiringDriveFieldRefs {
+    readonly id: FieldRef<"HiringDrive", 'String'>
+    readonly role: FieldRef<"HiringDrive", 'String'>
+    readonly description: FieldRef<"HiringDrive", 'String'>
+    readonly isActive: FieldRef<"HiringDrive", 'Boolean'>
+    readonly organisationId: FieldRef<"HiringDrive", 'String'>
+    readonly createdAt: FieldRef<"HiringDrive", 'DateTime'>
+    readonly updatedAt: FieldRef<"HiringDrive", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * HiringDrive findUnique
+   */
+  export type HiringDriveFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HiringDrive
+     */
+    select?: HiringDriveSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HiringDrive
+     */
+    omit?: HiringDriveOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HiringDriveInclude<ExtArgs> | null
+    /**
+     * Filter, which HiringDrive to fetch.
+     */
+    where: HiringDriveWhereUniqueInput
+  }
+
+  /**
+   * HiringDrive findUniqueOrThrow
+   */
+  export type HiringDriveFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HiringDrive
+     */
+    select?: HiringDriveSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HiringDrive
+     */
+    omit?: HiringDriveOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HiringDriveInclude<ExtArgs> | null
+    /**
+     * Filter, which HiringDrive to fetch.
+     */
+    where: HiringDriveWhereUniqueInput
+  }
+
+  /**
+   * HiringDrive findFirst
+   */
+  export type HiringDriveFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HiringDrive
+     */
+    select?: HiringDriveSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HiringDrive
+     */
+    omit?: HiringDriveOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HiringDriveInclude<ExtArgs> | null
+    /**
+     * Filter, which HiringDrive to fetch.
+     */
+    where?: HiringDriveWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of HiringDrives to fetch.
+     */
+    orderBy?: HiringDriveOrderByWithRelationInput | HiringDriveOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for HiringDrives.
+     */
+    cursor?: HiringDriveWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` HiringDrives from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` HiringDrives.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of HiringDrives.
+     */
+    distinct?: HiringDriveScalarFieldEnum | HiringDriveScalarFieldEnum[]
+  }
+
+  /**
+   * HiringDrive findFirstOrThrow
+   */
+  export type HiringDriveFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HiringDrive
+     */
+    select?: HiringDriveSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HiringDrive
+     */
+    omit?: HiringDriveOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HiringDriveInclude<ExtArgs> | null
+    /**
+     * Filter, which HiringDrive to fetch.
+     */
+    where?: HiringDriveWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of HiringDrives to fetch.
+     */
+    orderBy?: HiringDriveOrderByWithRelationInput | HiringDriveOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for HiringDrives.
+     */
+    cursor?: HiringDriveWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` HiringDrives from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` HiringDrives.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of HiringDrives.
+     */
+    distinct?: HiringDriveScalarFieldEnum | HiringDriveScalarFieldEnum[]
+  }
+
+  /**
+   * HiringDrive findMany
+   */
+  export type HiringDriveFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HiringDrive
+     */
+    select?: HiringDriveSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HiringDrive
+     */
+    omit?: HiringDriveOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HiringDriveInclude<ExtArgs> | null
+    /**
+     * Filter, which HiringDrives to fetch.
+     */
+    where?: HiringDriveWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of HiringDrives to fetch.
+     */
+    orderBy?: HiringDriveOrderByWithRelationInput | HiringDriveOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing HiringDrives.
+     */
+    cursor?: HiringDriveWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` HiringDrives from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` HiringDrives.
+     */
+    skip?: number
+    distinct?: HiringDriveScalarFieldEnum | HiringDriveScalarFieldEnum[]
+  }
+
+  /**
+   * HiringDrive create
+   */
+  export type HiringDriveCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HiringDrive
+     */
+    select?: HiringDriveSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HiringDrive
+     */
+    omit?: HiringDriveOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HiringDriveInclude<ExtArgs> | null
+    /**
+     * The data needed to create a HiringDrive.
+     */
+    data: XOR<HiringDriveCreateInput, HiringDriveUncheckedCreateInput>
+  }
+
+  /**
+   * HiringDrive createMany
+   */
+  export type HiringDriveCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many HiringDrives.
+     */
+    data: HiringDriveCreateManyInput | HiringDriveCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * HiringDrive createManyAndReturn
+   */
+  export type HiringDriveCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HiringDrive
+     */
+    select?: HiringDriveSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the HiringDrive
+     */
+    omit?: HiringDriveOmit<ExtArgs> | null
+    /**
+     * The data used to create many HiringDrives.
+     */
+    data: HiringDriveCreateManyInput | HiringDriveCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HiringDriveIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * HiringDrive update
+   */
+  export type HiringDriveUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HiringDrive
+     */
+    select?: HiringDriveSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HiringDrive
+     */
+    omit?: HiringDriveOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HiringDriveInclude<ExtArgs> | null
+    /**
+     * The data needed to update a HiringDrive.
+     */
+    data: XOR<HiringDriveUpdateInput, HiringDriveUncheckedUpdateInput>
+    /**
+     * Choose, which HiringDrive to update.
+     */
+    where: HiringDriveWhereUniqueInput
+  }
+
+  /**
+   * HiringDrive updateMany
+   */
+  export type HiringDriveUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update HiringDrives.
+     */
+    data: XOR<HiringDriveUpdateManyMutationInput, HiringDriveUncheckedUpdateManyInput>
+    /**
+     * Filter which HiringDrives to update
+     */
+    where?: HiringDriveWhereInput
+    /**
+     * Limit how many HiringDrives to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * HiringDrive updateManyAndReturn
+   */
+  export type HiringDriveUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HiringDrive
+     */
+    select?: HiringDriveSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the HiringDrive
+     */
+    omit?: HiringDriveOmit<ExtArgs> | null
+    /**
+     * The data used to update HiringDrives.
+     */
+    data: XOR<HiringDriveUpdateManyMutationInput, HiringDriveUncheckedUpdateManyInput>
+    /**
+     * Filter which HiringDrives to update
+     */
+    where?: HiringDriveWhereInput
+    /**
+     * Limit how many HiringDrives to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HiringDriveIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * HiringDrive upsert
+   */
+  export type HiringDriveUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HiringDrive
+     */
+    select?: HiringDriveSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HiringDrive
+     */
+    omit?: HiringDriveOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HiringDriveInclude<ExtArgs> | null
+    /**
+     * The filter to search for the HiringDrive to update in case it exists.
+     */
+    where: HiringDriveWhereUniqueInput
+    /**
+     * In case the HiringDrive found by the `where` argument doesn't exist, create a new HiringDrive with this data.
+     */
+    create: XOR<HiringDriveCreateInput, HiringDriveUncheckedCreateInput>
+    /**
+     * In case the HiringDrive was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<HiringDriveUpdateInput, HiringDriveUncheckedUpdateInput>
+  }
+
+  /**
+   * HiringDrive delete
+   */
+  export type HiringDriveDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HiringDrive
+     */
+    select?: HiringDriveSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HiringDrive
+     */
+    omit?: HiringDriveOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HiringDriveInclude<ExtArgs> | null
+    /**
+     * Filter which HiringDrive to delete.
+     */
+    where: HiringDriveWhereUniqueInput
+  }
+
+  /**
+   * HiringDrive deleteMany
+   */
+  export type HiringDriveDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which HiringDrives to delete
+     */
+    where?: HiringDriveWhereInput
+    /**
+     * Limit how many HiringDrives to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * HiringDrive without action
+   */
+  export type HiringDriveDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HiringDrive
+     */
+    select?: HiringDriveSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HiringDrive
+     */
+    omit?: HiringDriveOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HiringDriveInclude<ExtArgs> | null
   }
 
 
@@ -3275,6 +4487,19 @@ export namespace Prisma {
   };
 
   export type OrganisationScalarFieldEnum = (typeof OrganisationScalarFieldEnum)[keyof typeof OrganisationScalarFieldEnum]
+
+
+  export const HiringDriveScalarFieldEnum: {
+    id: 'id',
+    role: 'role',
+    description: 'description',
+    isActive: 'isActive',
+    organisationId: 'organisationId',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type HiringDriveScalarFieldEnum = (typeof HiringDriveScalarFieldEnum)[keyof typeof HiringDriveScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -3455,6 +4680,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Organisation"> | Date | string
     updatedAt?: DateTimeFilter<"Organisation"> | Date | string
     members?: UserListRelationFilter
+    drives?: HiringDriveListRelationFilter
   }
 
   export type OrganisationOrderByWithRelationInput = {
@@ -3466,6 +4692,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     members?: UserOrderByRelationAggregateInput
+    drives?: HiringDriveOrderByRelationAggregateInput
   }
 
   export type OrganisationWhereUniqueInput = Prisma.AtLeast<{
@@ -3480,6 +4707,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Organisation"> | Date | string
     updatedAt?: DateTimeFilter<"Organisation"> | Date | string
     members?: UserListRelationFilter
+    drives?: HiringDriveListRelationFilter
   }, "id" | "orgCode">
 
   export type OrganisationOrderByWithAggregationInput = {
@@ -3506,6 +4734,71 @@ export namespace Prisma {
     orgCode?: StringWithAggregatesFilter<"Organisation"> | string
     createdAt?: DateTimeWithAggregatesFilter<"Organisation"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Organisation"> | Date | string
+  }
+
+  export type HiringDriveWhereInput = {
+    AND?: HiringDriveWhereInput | HiringDriveWhereInput[]
+    OR?: HiringDriveWhereInput[]
+    NOT?: HiringDriveWhereInput | HiringDriveWhereInput[]
+    id?: StringFilter<"HiringDrive"> | string
+    role?: StringFilter<"HiringDrive"> | string
+    description?: StringNullableFilter<"HiringDrive"> | string | null
+    isActive?: BoolFilter<"HiringDrive"> | boolean
+    organisationId?: StringFilter<"HiringDrive"> | string
+    createdAt?: DateTimeFilter<"HiringDrive"> | Date | string
+    updatedAt?: DateTimeFilter<"HiringDrive"> | Date | string
+    organisation?: XOR<OrganisationScalarRelationFilter, OrganisationWhereInput>
+  }
+
+  export type HiringDriveOrderByWithRelationInput = {
+    id?: SortOrder
+    role?: SortOrder
+    description?: SortOrderInput | SortOrder
+    isActive?: SortOrder
+    organisationId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    organisation?: OrganisationOrderByWithRelationInput
+  }
+
+  export type HiringDriveWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: HiringDriveWhereInput | HiringDriveWhereInput[]
+    OR?: HiringDriveWhereInput[]
+    NOT?: HiringDriveWhereInput | HiringDriveWhereInput[]
+    role?: StringFilter<"HiringDrive"> | string
+    description?: StringNullableFilter<"HiringDrive"> | string | null
+    isActive?: BoolFilter<"HiringDrive"> | boolean
+    organisationId?: StringFilter<"HiringDrive"> | string
+    createdAt?: DateTimeFilter<"HiringDrive"> | Date | string
+    updatedAt?: DateTimeFilter<"HiringDrive"> | Date | string
+    organisation?: XOR<OrganisationScalarRelationFilter, OrganisationWhereInput>
+  }, "id">
+
+  export type HiringDriveOrderByWithAggregationInput = {
+    id?: SortOrder
+    role?: SortOrder
+    description?: SortOrderInput | SortOrder
+    isActive?: SortOrder
+    organisationId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: HiringDriveCountOrderByAggregateInput
+    _max?: HiringDriveMaxOrderByAggregateInput
+    _min?: HiringDriveMinOrderByAggregateInput
+  }
+
+  export type HiringDriveScalarWhereWithAggregatesInput = {
+    AND?: HiringDriveScalarWhereWithAggregatesInput | HiringDriveScalarWhereWithAggregatesInput[]
+    OR?: HiringDriveScalarWhereWithAggregatesInput[]
+    NOT?: HiringDriveScalarWhereWithAggregatesInput | HiringDriveScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"HiringDrive"> | string
+    role?: StringWithAggregatesFilter<"HiringDrive"> | string
+    description?: StringNullableWithAggregatesFilter<"HiringDrive"> | string | null
+    isActive?: BoolWithAggregatesFilter<"HiringDrive"> | boolean
+    organisationId?: StringWithAggregatesFilter<"HiringDrive"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"HiringDrive"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"HiringDrive"> | Date | string
   }
 
   export type UserCreateInput = {
@@ -3614,6 +4907,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: UserCreateNestedManyWithoutOrganisationInput
+    drives?: HiringDriveCreateNestedManyWithoutOrganisationInput
   }
 
   export type OrganisationUncheckedCreateInput = {
@@ -3625,6 +4919,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: UserUncheckedCreateNestedManyWithoutOrganisationInput
+    drives?: HiringDriveUncheckedCreateNestedManyWithoutOrganisationInput
   }
 
   export type OrganisationUpdateInput = {
@@ -3636,6 +4931,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: UserUpdateManyWithoutOrganisationNestedInput
+    drives?: HiringDriveUpdateManyWithoutOrganisationNestedInput
   }
 
   export type OrganisationUncheckedUpdateInput = {
@@ -3647,6 +4943,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: UserUncheckedUpdateManyWithoutOrganisationNestedInput
+    drives?: HiringDriveUncheckedUpdateManyWithoutOrganisationNestedInput
   }
 
   export type OrganisationCreateManyInput = {
@@ -3675,6 +4972,75 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     category?: StringFieldUpdateOperationsInput | string
     orgCode?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type HiringDriveCreateInput = {
+    id?: string
+    role: string
+    description?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    organisation: OrganisationCreateNestedOneWithoutDrivesInput
+  }
+
+  export type HiringDriveUncheckedCreateInput = {
+    id?: string
+    role: string
+    description?: string | null
+    isActive?: boolean
+    organisationId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type HiringDriveUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    role?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    organisation?: OrganisationUpdateOneRequiredWithoutDrivesNestedInput
+  }
+
+  export type HiringDriveUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    role?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    organisationId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type HiringDriveCreateManyInput = {
+    id?: string
+    role: string
+    description?: string | null
+    isActive?: boolean
+    organisationId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type HiringDriveUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    role?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type HiringDriveUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    role?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    organisationId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -3841,7 +5207,17 @@ export namespace Prisma {
     none?: UserWhereInput
   }
 
+  export type HiringDriveListRelationFilter = {
+    every?: HiringDriveWhereInput
+    some?: HiringDriveWhereInput
+    none?: HiringDriveWhereInput
+  }
+
   export type UserOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type HiringDriveOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -3871,6 +5247,41 @@ export namespace Prisma {
     description?: SortOrder
     category?: SortOrder
     orgCode?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type OrganisationScalarRelationFilter = {
+    is?: OrganisationWhereInput
+    isNot?: OrganisationWhereInput
+  }
+
+  export type HiringDriveCountOrderByAggregateInput = {
+    id?: SortOrder
+    role?: SortOrder
+    description?: SortOrder
+    isActive?: SortOrder
+    organisationId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type HiringDriveMaxOrderByAggregateInput = {
+    id?: SortOrder
+    role?: SortOrder
+    description?: SortOrder
+    isActive?: SortOrder
+    organisationId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type HiringDriveMinOrderByAggregateInput = {
+    id?: SortOrder
+    role?: SortOrder
+    description?: SortOrder
+    isActive?: SortOrder
+    organisationId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -3914,11 +5325,25 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
   }
 
+  export type HiringDriveCreateNestedManyWithoutOrganisationInput = {
+    create?: XOR<HiringDriveCreateWithoutOrganisationInput, HiringDriveUncheckedCreateWithoutOrganisationInput> | HiringDriveCreateWithoutOrganisationInput[] | HiringDriveUncheckedCreateWithoutOrganisationInput[]
+    connectOrCreate?: HiringDriveCreateOrConnectWithoutOrganisationInput | HiringDriveCreateOrConnectWithoutOrganisationInput[]
+    createMany?: HiringDriveCreateManyOrganisationInputEnvelope
+    connect?: HiringDriveWhereUniqueInput | HiringDriveWhereUniqueInput[]
+  }
+
   export type UserUncheckedCreateNestedManyWithoutOrganisationInput = {
     create?: XOR<UserCreateWithoutOrganisationInput, UserUncheckedCreateWithoutOrganisationInput> | UserCreateWithoutOrganisationInput[] | UserUncheckedCreateWithoutOrganisationInput[]
     connectOrCreate?: UserCreateOrConnectWithoutOrganisationInput | UserCreateOrConnectWithoutOrganisationInput[]
     createMany?: UserCreateManyOrganisationInputEnvelope
     connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+  }
+
+  export type HiringDriveUncheckedCreateNestedManyWithoutOrganisationInput = {
+    create?: XOR<HiringDriveCreateWithoutOrganisationInput, HiringDriveUncheckedCreateWithoutOrganisationInput> | HiringDriveCreateWithoutOrganisationInput[] | HiringDriveUncheckedCreateWithoutOrganisationInput[]
+    connectOrCreate?: HiringDriveCreateOrConnectWithoutOrganisationInput | HiringDriveCreateOrConnectWithoutOrganisationInput[]
+    createMany?: HiringDriveCreateManyOrganisationInputEnvelope
+    connect?: HiringDriveWhereUniqueInput | HiringDriveWhereUniqueInput[]
   }
 
   export type UserUpdateManyWithoutOrganisationNestedInput = {
@@ -3935,6 +5360,20 @@ export namespace Prisma {
     deleteMany?: UserScalarWhereInput | UserScalarWhereInput[]
   }
 
+  export type HiringDriveUpdateManyWithoutOrganisationNestedInput = {
+    create?: XOR<HiringDriveCreateWithoutOrganisationInput, HiringDriveUncheckedCreateWithoutOrganisationInput> | HiringDriveCreateWithoutOrganisationInput[] | HiringDriveUncheckedCreateWithoutOrganisationInput[]
+    connectOrCreate?: HiringDriveCreateOrConnectWithoutOrganisationInput | HiringDriveCreateOrConnectWithoutOrganisationInput[]
+    upsert?: HiringDriveUpsertWithWhereUniqueWithoutOrganisationInput | HiringDriveUpsertWithWhereUniqueWithoutOrganisationInput[]
+    createMany?: HiringDriveCreateManyOrganisationInputEnvelope
+    set?: HiringDriveWhereUniqueInput | HiringDriveWhereUniqueInput[]
+    disconnect?: HiringDriveWhereUniqueInput | HiringDriveWhereUniqueInput[]
+    delete?: HiringDriveWhereUniqueInput | HiringDriveWhereUniqueInput[]
+    connect?: HiringDriveWhereUniqueInput | HiringDriveWhereUniqueInput[]
+    update?: HiringDriveUpdateWithWhereUniqueWithoutOrganisationInput | HiringDriveUpdateWithWhereUniqueWithoutOrganisationInput[]
+    updateMany?: HiringDriveUpdateManyWithWhereWithoutOrganisationInput | HiringDriveUpdateManyWithWhereWithoutOrganisationInput[]
+    deleteMany?: HiringDriveScalarWhereInput | HiringDriveScalarWhereInput[]
+  }
+
   export type UserUncheckedUpdateManyWithoutOrganisationNestedInput = {
     create?: XOR<UserCreateWithoutOrganisationInput, UserUncheckedCreateWithoutOrganisationInput> | UserCreateWithoutOrganisationInput[] | UserUncheckedCreateWithoutOrganisationInput[]
     connectOrCreate?: UserCreateOrConnectWithoutOrganisationInput | UserCreateOrConnectWithoutOrganisationInput[]
@@ -3947,6 +5386,34 @@ export namespace Prisma {
     update?: UserUpdateWithWhereUniqueWithoutOrganisationInput | UserUpdateWithWhereUniqueWithoutOrganisationInput[]
     updateMany?: UserUpdateManyWithWhereWithoutOrganisationInput | UserUpdateManyWithWhereWithoutOrganisationInput[]
     deleteMany?: UserScalarWhereInput | UserScalarWhereInput[]
+  }
+
+  export type HiringDriveUncheckedUpdateManyWithoutOrganisationNestedInput = {
+    create?: XOR<HiringDriveCreateWithoutOrganisationInput, HiringDriveUncheckedCreateWithoutOrganisationInput> | HiringDriveCreateWithoutOrganisationInput[] | HiringDriveUncheckedCreateWithoutOrganisationInput[]
+    connectOrCreate?: HiringDriveCreateOrConnectWithoutOrganisationInput | HiringDriveCreateOrConnectWithoutOrganisationInput[]
+    upsert?: HiringDriveUpsertWithWhereUniqueWithoutOrganisationInput | HiringDriveUpsertWithWhereUniqueWithoutOrganisationInput[]
+    createMany?: HiringDriveCreateManyOrganisationInputEnvelope
+    set?: HiringDriveWhereUniqueInput | HiringDriveWhereUniqueInput[]
+    disconnect?: HiringDriveWhereUniqueInput | HiringDriveWhereUniqueInput[]
+    delete?: HiringDriveWhereUniqueInput | HiringDriveWhereUniqueInput[]
+    connect?: HiringDriveWhereUniqueInput | HiringDriveWhereUniqueInput[]
+    update?: HiringDriveUpdateWithWhereUniqueWithoutOrganisationInput | HiringDriveUpdateWithWhereUniqueWithoutOrganisationInput[]
+    updateMany?: HiringDriveUpdateManyWithWhereWithoutOrganisationInput | HiringDriveUpdateManyWithWhereWithoutOrganisationInput[]
+    deleteMany?: HiringDriveScalarWhereInput | HiringDriveScalarWhereInput[]
+  }
+
+  export type OrganisationCreateNestedOneWithoutDrivesInput = {
+    create?: XOR<OrganisationCreateWithoutDrivesInput, OrganisationUncheckedCreateWithoutDrivesInput>
+    connectOrCreate?: OrganisationCreateOrConnectWithoutDrivesInput
+    connect?: OrganisationWhereUniqueInput
+  }
+
+  export type OrganisationUpdateOneRequiredWithoutDrivesNestedInput = {
+    create?: XOR<OrganisationCreateWithoutDrivesInput, OrganisationUncheckedCreateWithoutDrivesInput>
+    connectOrCreate?: OrganisationCreateOrConnectWithoutDrivesInput
+    upsert?: OrganisationUpsertWithoutDrivesInput
+    connect?: OrganisationWhereUniqueInput
+    update?: XOR<XOR<OrganisationUpdateToOneWithWhereWithoutDrivesInput, OrganisationUpdateWithoutDrivesInput>, OrganisationUncheckedUpdateWithoutDrivesInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -4079,6 +5546,7 @@ export namespace Prisma {
     orgCode: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    drives?: HiringDriveCreateNestedManyWithoutOrganisationInput
   }
 
   export type OrganisationUncheckedCreateWithoutMembersInput = {
@@ -4089,6 +5557,7 @@ export namespace Prisma {
     orgCode: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    drives?: HiringDriveUncheckedCreateNestedManyWithoutOrganisationInput
   }
 
   export type OrganisationCreateOrConnectWithoutMembersInput = {
@@ -4115,6 +5584,7 @@ export namespace Prisma {
     orgCode?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    drives?: HiringDriveUpdateManyWithoutOrganisationNestedInput
   }
 
   export type OrganisationUncheckedUpdateWithoutMembersInput = {
@@ -4125,6 +5595,7 @@ export namespace Prisma {
     orgCode?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    drives?: HiringDriveUncheckedUpdateManyWithoutOrganisationNestedInput
   }
 
   export type UserCreateWithoutOrganisationInput = {
@@ -4163,6 +5634,34 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type HiringDriveCreateWithoutOrganisationInput = {
+    id?: string
+    role: string
+    description?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type HiringDriveUncheckedCreateWithoutOrganisationInput = {
+    id?: string
+    role: string
+    description?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type HiringDriveCreateOrConnectWithoutOrganisationInput = {
+    where: HiringDriveWhereUniqueInput
+    create: XOR<HiringDriveCreateWithoutOrganisationInput, HiringDriveUncheckedCreateWithoutOrganisationInput>
+  }
+
+  export type HiringDriveCreateManyOrganisationInputEnvelope = {
+    data: HiringDriveCreateManyOrganisationInput | HiringDriveCreateManyOrganisationInput[]
+    skipDuplicates?: boolean
+  }
+
   export type UserUpsertWithWhereUniqueWithoutOrganisationInput = {
     where: UserWhereUniqueInput
     update: XOR<UserUpdateWithoutOrganisationInput, UserUncheckedUpdateWithoutOrganisationInput>
@@ -4196,6 +5695,95 @@ export namespace Prisma {
     organisationRole?: StringNullableFilter<"User"> | string | null
   }
 
+  export type HiringDriveUpsertWithWhereUniqueWithoutOrganisationInput = {
+    where: HiringDriveWhereUniqueInput
+    update: XOR<HiringDriveUpdateWithoutOrganisationInput, HiringDriveUncheckedUpdateWithoutOrganisationInput>
+    create: XOR<HiringDriveCreateWithoutOrganisationInput, HiringDriveUncheckedCreateWithoutOrganisationInput>
+  }
+
+  export type HiringDriveUpdateWithWhereUniqueWithoutOrganisationInput = {
+    where: HiringDriveWhereUniqueInput
+    data: XOR<HiringDriveUpdateWithoutOrganisationInput, HiringDriveUncheckedUpdateWithoutOrganisationInput>
+  }
+
+  export type HiringDriveUpdateManyWithWhereWithoutOrganisationInput = {
+    where: HiringDriveScalarWhereInput
+    data: XOR<HiringDriveUpdateManyMutationInput, HiringDriveUncheckedUpdateManyWithoutOrganisationInput>
+  }
+
+  export type HiringDriveScalarWhereInput = {
+    AND?: HiringDriveScalarWhereInput | HiringDriveScalarWhereInput[]
+    OR?: HiringDriveScalarWhereInput[]
+    NOT?: HiringDriveScalarWhereInput | HiringDriveScalarWhereInput[]
+    id?: StringFilter<"HiringDrive"> | string
+    role?: StringFilter<"HiringDrive"> | string
+    description?: StringNullableFilter<"HiringDrive"> | string | null
+    isActive?: BoolFilter<"HiringDrive"> | boolean
+    organisationId?: StringFilter<"HiringDrive"> | string
+    createdAt?: DateTimeFilter<"HiringDrive"> | Date | string
+    updatedAt?: DateTimeFilter<"HiringDrive"> | Date | string
+  }
+
+  export type OrganisationCreateWithoutDrivesInput = {
+    id?: string
+    name: string
+    description?: string | null
+    category: string
+    orgCode: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    members?: UserCreateNestedManyWithoutOrganisationInput
+  }
+
+  export type OrganisationUncheckedCreateWithoutDrivesInput = {
+    id?: string
+    name: string
+    description?: string | null
+    category: string
+    orgCode: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    members?: UserUncheckedCreateNestedManyWithoutOrganisationInput
+  }
+
+  export type OrganisationCreateOrConnectWithoutDrivesInput = {
+    where: OrganisationWhereUniqueInput
+    create: XOR<OrganisationCreateWithoutDrivesInput, OrganisationUncheckedCreateWithoutDrivesInput>
+  }
+
+  export type OrganisationUpsertWithoutDrivesInput = {
+    update: XOR<OrganisationUpdateWithoutDrivesInput, OrganisationUncheckedUpdateWithoutDrivesInput>
+    create: XOR<OrganisationCreateWithoutDrivesInput, OrganisationUncheckedCreateWithoutDrivesInput>
+    where?: OrganisationWhereInput
+  }
+
+  export type OrganisationUpdateToOneWithWhereWithoutDrivesInput = {
+    where?: OrganisationWhereInput
+    data: XOR<OrganisationUpdateWithoutDrivesInput, OrganisationUncheckedUpdateWithoutDrivesInput>
+  }
+
+  export type OrganisationUpdateWithoutDrivesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: StringFieldUpdateOperationsInput | string
+    orgCode?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    members?: UserUpdateManyWithoutOrganisationNestedInput
+  }
+
+  export type OrganisationUncheckedUpdateWithoutDrivesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: StringFieldUpdateOperationsInput | string
+    orgCode?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    members?: UserUncheckedUpdateManyWithoutOrganisationNestedInput
+  }
+
   export type UserCreateManyOrganisationInput = {
     id?: string
     fullName: string
@@ -4207,6 +5795,15 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     organisationRole?: string | null
+  }
+
+  export type HiringDriveCreateManyOrganisationInput = {
+    id?: string
+    role: string
+    description?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type UserUpdateWithoutOrganisationInput = {
@@ -4246,6 +5843,33 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organisationRole?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type HiringDriveUpdateWithoutOrganisationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    role?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type HiringDriveUncheckedUpdateWithoutOrganisationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    role?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type HiringDriveUncheckedUpdateManyWithoutOrganisationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    role?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
 

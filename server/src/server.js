@@ -7,7 +7,7 @@ const path = require("path");
 const fs = require("fs");
 const { createInterviewWebSocketServer } = require("./websocket");
 const { swaggerUi, specs } = require("./swagger");
-const { userAuthRouter, organisationRouter } = require("./api");
+const { userAuthRouter, organisationRouter, driveRouter } = require("./api");
 
 const app = express();
 app.use(cors());
@@ -17,6 +17,7 @@ app.use(express.static(path.join(__dirname, "..", "public")));
 // ─── API Routes ───────────────────────────────────────────────────────────────
 app.use("/api/auth/user", userAuthRouter);
 app.use("/api/organisation", organisationRouter);
+app.use("/api/drive", driveRouter);
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 

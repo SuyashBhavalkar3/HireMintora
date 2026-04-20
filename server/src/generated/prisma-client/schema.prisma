@@ -13,24 +13,23 @@ datasource db {
 }
 
 // ─────────────────────────────────────────────
-// Organisation (HR / Employer Account)
+// User (HR / Employer Account)
 // Supports two auth methods:
 //   1. Manual  — email + hashed password
 //   2. OAuth   — Supabase OAuth (Google, GitHub, etc.)
-// An org may link both (e.g., signed up via OAuth,
+// A user may link both (e.g., signed up via OAuth,
 // later added a password). The email is always the
 // canonical unique identifier.
 // ─────────────────────────────────────────────
-model Organisation {
+model User {
   id       String @id @default(uuid())
   fullName String
   email    String @unique
 
-  // Manual auth — nullable so OAuth-only orgs skip it
+  // Manual auth — nullable so OAuth-only users skip it
   passwordHash String?
 
-  // Supabase OAuth — nullable for manual-only orgs
-  // supabaseUserId maps to auth.users.id in Supabase
+  // Supabase OAuth — nullable for manual-only users
   supabaseUserId String? @unique
   oauthProvider  String? // e.g. "google", "github"
 
@@ -38,19 +37,19 @@ model Organisation {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Company Link
-  companyId   String?
-  company     Company? @relation(fields: [companyId], references: [id])
-  companyRole String? // 'OWNER' | 'MEMBER'
+  // Organisation Link
+  organisationId   String?
+  organisation     Organisation? @relation(fields: [organisationId], references: [id])
+  organisationRole String? // 'OWNER' | 'MEMBER'
 
-  @@map("organisations")
+  @@map("users")
 }
 
 // ─────────────────────────────────────────────
-// Company (Workspace / Business Entity)
-// An HR Organisation user can create or join a company.
+// Organisation (Workspace / Business Entity)
+// An HR User can create or join an organisation.
 // ─────────────────────────────────────────────
-model Company {
+model Organisation {
   id          String  @id @default(uuid())
   name        String
   description String?
@@ -58,10 +57,30 @@ model Company {
   orgCode     String  @unique
 
   // Relations
-  members Organisation[]
+  members User[]
+  drives  HiringDrive[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@map("companies")
+  @@map("organisations")
+}
+
+// ─────────────────────────────────────────────
+// Hiring Drive
+// An organisation can create hiring drives for roles.
+// ─────────────────────────────────────────────
+model HiringDrive {
+  id          String  @id @default(uuid())
+  role        String
+  description String?
+  isActive    Boolean @default(true)
+
+  organisationId String
+  organisation   Organisation @relation(fields: [organisationId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("hiring_drives")
 }
