@@ -155,6 +155,17 @@ exports.Prisma.HiringDriveScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.DriveCandidateScalarFieldEnum = {
+  id: 'id',
+  email: 'email',
+  fullName: 'fullName',
+  token: 'token',
+  status: 'status',
+  hiringDriveId: 'hiringDriveId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -174,7 +185,8 @@ exports.Prisma.NullsOrder = {
 exports.Prisma.ModelName = {
   User: 'User',
   Organisation: 'Organisation',
-  HiringDrive: 'HiringDrive'
+  HiringDrive: 'HiringDrive',
+  DriveCandidate: 'DriveCandidate'
 };
 
 /**

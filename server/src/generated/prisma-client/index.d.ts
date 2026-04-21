@@ -28,6 +28,11 @@ export type Organisation = $Result.DefaultSelection<Prisma.$OrganisationPayload>
  * 
  */
 export type HiringDrive = $Result.DefaultSelection<Prisma.$HiringDrivePayload>
+/**
+ * Model DriveCandidate
+ * 
+ */
+export type DriveCandidate = $Result.DefaultSelection<Prisma.$DriveCandidatePayload>
 
 /**
  * ##  Prisma Client ʲˢ
@@ -176,6 +181,16 @@ export class PrismaClient<
     * ```
     */
   get hiringDrive(): Prisma.HiringDriveDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.driveCandidate`: Exposes CRUD operations for the **DriveCandidate** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more DriveCandidates
+    * const driveCandidates = await prisma.driveCandidate.findMany()
+    * ```
+    */
+  get driveCandidate(): Prisma.DriveCandidateDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -619,7 +634,8 @@ export namespace Prisma {
   export const ModelName: {
     User: 'User',
     Organisation: 'Organisation',
-    HiringDrive: 'HiringDrive'
+    HiringDrive: 'HiringDrive',
+    DriveCandidate: 'DriveCandidate'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -638,7 +654,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "organisation" | "hiringDrive"
+      modelProps: "user" | "organisation" | "hiringDrive" | "driveCandidate"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -864,6 +880,80 @@ export namespace Prisma {
           }
         }
       }
+      DriveCandidate: {
+        payload: Prisma.$DriveCandidatePayload<ExtArgs>
+        fields: Prisma.DriveCandidateFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.DriveCandidateFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DriveCandidatePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.DriveCandidateFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DriveCandidatePayload>
+          }
+          findFirst: {
+            args: Prisma.DriveCandidateFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DriveCandidatePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.DriveCandidateFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DriveCandidatePayload>
+          }
+          findMany: {
+            args: Prisma.DriveCandidateFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DriveCandidatePayload>[]
+          }
+          create: {
+            args: Prisma.DriveCandidateCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DriveCandidatePayload>
+          }
+          createMany: {
+            args: Prisma.DriveCandidateCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.DriveCandidateCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DriveCandidatePayload>[]
+          }
+          delete: {
+            args: Prisma.DriveCandidateDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DriveCandidatePayload>
+          }
+          update: {
+            args: Prisma.DriveCandidateUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DriveCandidatePayload>
+          }
+          deleteMany: {
+            args: Prisma.DriveCandidateDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.DriveCandidateUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.DriveCandidateUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DriveCandidatePayload>[]
+          }
+          upsert: {
+            args: Prisma.DriveCandidateUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DriveCandidatePayload>
+          }
+          aggregate: {
+            args: Prisma.DriveCandidateAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateDriveCandidate>
+          }
+          groupBy: {
+            args: Prisma.DriveCandidateGroupByArgs<ExtArgs>
+            result: $Utils.Optional<DriveCandidateGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.DriveCandidateCountArgs<ExtArgs>
+            result: $Utils.Optional<DriveCandidateCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -963,6 +1053,7 @@ export namespace Prisma {
     user?: UserOmit
     organisation?: OrganisationOmit
     hiringDrive?: HiringDriveOmit
+    driveCandidate?: DriveCandidateOmit
   }
 
   /* Types for Logging */
@@ -1075,6 +1166,37 @@ export namespace Prisma {
    */
   export type OrganisationCountOutputTypeCountDrivesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: HiringDriveWhereInput
+  }
+
+
+  /**
+   * Count Type HiringDriveCountOutputType
+   */
+
+  export type HiringDriveCountOutputType = {
+    candidates: number
+  }
+
+  export type HiringDriveCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    candidates?: boolean | HiringDriveCountOutputTypeCountCandidatesArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * HiringDriveCountOutputType without action
+   */
+  export type HiringDriveCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HiringDriveCountOutputType
+     */
+    select?: HiringDriveCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * HiringDriveCountOutputType without action
+   */
+  export type HiringDriveCountOutputTypeCountCandidatesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DriveCandidateWhereInput
   }
 
 
@@ -3542,6 +3664,8 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     organisation?: boolean | OrganisationDefaultArgs<ExtArgs>
+    candidates?: boolean | HiringDrive$candidatesArgs<ExtArgs>
+    _count?: boolean | HiringDriveCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["hiringDrive"]>
 
   export type HiringDriveSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -3579,6 +3703,8 @@ export namespace Prisma {
   export type HiringDriveOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "role" | "description" | "isActive" | "organisationId" | "createdAt" | "updatedAt", ExtArgs["result"]["hiringDrive"]>
   export type HiringDriveInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     organisation?: boolean | OrganisationDefaultArgs<ExtArgs>
+    candidates?: boolean | HiringDrive$candidatesArgs<ExtArgs>
+    _count?: boolean | HiringDriveCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type HiringDriveIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     organisation?: boolean | OrganisationDefaultArgs<ExtArgs>
@@ -3591,6 +3717,7 @@ export namespace Prisma {
     name: "HiringDrive"
     objects: {
       organisation: Prisma.$OrganisationPayload<ExtArgs>
+      candidates: Prisma.$DriveCandidatePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -3995,6 +4122,7 @@ export namespace Prisma {
   export interface Prisma__HiringDriveClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     organisation<T extends OrganisationDefaultArgs<ExtArgs> = {}>(args?: Subset<T, OrganisationDefaultArgs<ExtArgs>>): Prisma__OrganisationClient<$Result.GetResult<Prisma.$OrganisationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    candidates<T extends HiringDrive$candidatesArgs<ExtArgs> = {}>(args?: Subset<T, HiringDrive$candidatesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DriveCandidatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4427,6 +4555,30 @@ export namespace Prisma {
   }
 
   /**
+   * HiringDrive.candidates
+   */
+  export type HiringDrive$candidatesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DriveCandidate
+     */
+    select?: DriveCandidateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DriveCandidate
+     */
+    omit?: DriveCandidateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DriveCandidateInclude<ExtArgs> | null
+    where?: DriveCandidateWhereInput
+    orderBy?: DriveCandidateOrderByWithRelationInput | DriveCandidateOrderByWithRelationInput[]
+    cursor?: DriveCandidateWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DriveCandidateScalarFieldEnum | DriveCandidateScalarFieldEnum[]
+  }
+
+  /**
    * HiringDrive without action
    */
   export type HiringDriveDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4442,6 +4594,1103 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: HiringDriveInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model DriveCandidate
+   */
+
+  export type AggregateDriveCandidate = {
+    _count: DriveCandidateCountAggregateOutputType | null
+    _min: DriveCandidateMinAggregateOutputType | null
+    _max: DriveCandidateMaxAggregateOutputType | null
+  }
+
+  export type DriveCandidateMinAggregateOutputType = {
+    id: string | null
+    email: string | null
+    fullName: string | null
+    token: string | null
+    status: string | null
+    hiringDriveId: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type DriveCandidateMaxAggregateOutputType = {
+    id: string | null
+    email: string | null
+    fullName: string | null
+    token: string | null
+    status: string | null
+    hiringDriveId: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type DriveCandidateCountAggregateOutputType = {
+    id: number
+    email: number
+    fullName: number
+    token: number
+    status: number
+    hiringDriveId: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type DriveCandidateMinAggregateInputType = {
+    id?: true
+    email?: true
+    fullName?: true
+    token?: true
+    status?: true
+    hiringDriveId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type DriveCandidateMaxAggregateInputType = {
+    id?: true
+    email?: true
+    fullName?: true
+    token?: true
+    status?: true
+    hiringDriveId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type DriveCandidateCountAggregateInputType = {
+    id?: true
+    email?: true
+    fullName?: true
+    token?: true
+    status?: true
+    hiringDriveId?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type DriveCandidateAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DriveCandidate to aggregate.
+     */
+    where?: DriveCandidateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DriveCandidates to fetch.
+     */
+    orderBy?: DriveCandidateOrderByWithRelationInput | DriveCandidateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: DriveCandidateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DriveCandidates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DriveCandidates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned DriveCandidates
+    **/
+    _count?: true | DriveCandidateCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: DriveCandidateMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: DriveCandidateMaxAggregateInputType
+  }
+
+  export type GetDriveCandidateAggregateType<T extends DriveCandidateAggregateArgs> = {
+        [P in keyof T & keyof AggregateDriveCandidate]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateDriveCandidate[P]>
+      : GetScalarType<T[P], AggregateDriveCandidate[P]>
+  }
+
+
+
+
+  export type DriveCandidateGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DriveCandidateWhereInput
+    orderBy?: DriveCandidateOrderByWithAggregationInput | DriveCandidateOrderByWithAggregationInput[]
+    by: DriveCandidateScalarFieldEnum[] | DriveCandidateScalarFieldEnum
+    having?: DriveCandidateScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: DriveCandidateCountAggregateInputType | true
+    _min?: DriveCandidateMinAggregateInputType
+    _max?: DriveCandidateMaxAggregateInputType
+  }
+
+  export type DriveCandidateGroupByOutputType = {
+    id: string
+    email: string
+    fullName: string
+    token: string
+    status: string
+    hiringDriveId: string
+    createdAt: Date
+    updatedAt: Date
+    _count: DriveCandidateCountAggregateOutputType | null
+    _min: DriveCandidateMinAggregateOutputType | null
+    _max: DriveCandidateMaxAggregateOutputType | null
+  }
+
+  type GetDriveCandidateGroupByPayload<T extends DriveCandidateGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<DriveCandidateGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof DriveCandidateGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], DriveCandidateGroupByOutputType[P]>
+            : GetScalarType<T[P], DriveCandidateGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type DriveCandidateSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    email?: boolean
+    fullName?: boolean
+    token?: boolean
+    status?: boolean
+    hiringDriveId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    hiringDrive?: boolean | HiringDriveDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["driveCandidate"]>
+
+  export type DriveCandidateSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    email?: boolean
+    fullName?: boolean
+    token?: boolean
+    status?: boolean
+    hiringDriveId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    hiringDrive?: boolean | HiringDriveDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["driveCandidate"]>
+
+  export type DriveCandidateSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    email?: boolean
+    fullName?: boolean
+    token?: boolean
+    status?: boolean
+    hiringDriveId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    hiringDrive?: boolean | HiringDriveDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["driveCandidate"]>
+
+  export type DriveCandidateSelectScalar = {
+    id?: boolean
+    email?: boolean
+    fullName?: boolean
+    token?: boolean
+    status?: boolean
+    hiringDriveId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type DriveCandidateOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "fullName" | "token" | "status" | "hiringDriveId" | "createdAt" | "updatedAt", ExtArgs["result"]["driveCandidate"]>
+  export type DriveCandidateInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    hiringDrive?: boolean | HiringDriveDefaultArgs<ExtArgs>
+  }
+  export type DriveCandidateIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    hiringDrive?: boolean | HiringDriveDefaultArgs<ExtArgs>
+  }
+  export type DriveCandidateIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    hiringDrive?: boolean | HiringDriveDefaultArgs<ExtArgs>
+  }
+
+  export type $DriveCandidatePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "DriveCandidate"
+    objects: {
+      hiringDrive: Prisma.$HiringDrivePayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      email: string
+      fullName: string
+      token: string
+      status: string
+      hiringDriveId: string
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["driveCandidate"]>
+    composites: {}
+  }
+
+  type DriveCandidateGetPayload<S extends boolean | null | undefined | DriveCandidateDefaultArgs> = $Result.GetResult<Prisma.$DriveCandidatePayload, S>
+
+  type DriveCandidateCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<DriveCandidateFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: DriveCandidateCountAggregateInputType | true
+    }
+
+  export interface DriveCandidateDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['DriveCandidate'], meta: { name: 'DriveCandidate' } }
+    /**
+     * Find zero or one DriveCandidate that matches the filter.
+     * @param {DriveCandidateFindUniqueArgs} args - Arguments to find a DriveCandidate
+     * @example
+     * // Get one DriveCandidate
+     * const driveCandidate = await prisma.driveCandidate.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends DriveCandidateFindUniqueArgs>(args: SelectSubset<T, DriveCandidateFindUniqueArgs<ExtArgs>>): Prisma__DriveCandidateClient<$Result.GetResult<Prisma.$DriveCandidatePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one DriveCandidate that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {DriveCandidateFindUniqueOrThrowArgs} args - Arguments to find a DriveCandidate
+     * @example
+     * // Get one DriveCandidate
+     * const driveCandidate = await prisma.driveCandidate.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends DriveCandidateFindUniqueOrThrowArgs>(args: SelectSubset<T, DriveCandidateFindUniqueOrThrowArgs<ExtArgs>>): Prisma__DriveCandidateClient<$Result.GetResult<Prisma.$DriveCandidatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first DriveCandidate that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DriveCandidateFindFirstArgs} args - Arguments to find a DriveCandidate
+     * @example
+     * // Get one DriveCandidate
+     * const driveCandidate = await prisma.driveCandidate.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends DriveCandidateFindFirstArgs>(args?: SelectSubset<T, DriveCandidateFindFirstArgs<ExtArgs>>): Prisma__DriveCandidateClient<$Result.GetResult<Prisma.$DriveCandidatePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first DriveCandidate that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DriveCandidateFindFirstOrThrowArgs} args - Arguments to find a DriveCandidate
+     * @example
+     * // Get one DriveCandidate
+     * const driveCandidate = await prisma.driveCandidate.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends DriveCandidateFindFirstOrThrowArgs>(args?: SelectSubset<T, DriveCandidateFindFirstOrThrowArgs<ExtArgs>>): Prisma__DriveCandidateClient<$Result.GetResult<Prisma.$DriveCandidatePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more DriveCandidates that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DriveCandidateFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all DriveCandidates
+     * const driveCandidates = await prisma.driveCandidate.findMany()
+     * 
+     * // Get first 10 DriveCandidates
+     * const driveCandidates = await prisma.driveCandidate.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const driveCandidateWithIdOnly = await prisma.driveCandidate.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends DriveCandidateFindManyArgs>(args?: SelectSubset<T, DriveCandidateFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DriveCandidatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a DriveCandidate.
+     * @param {DriveCandidateCreateArgs} args - Arguments to create a DriveCandidate.
+     * @example
+     * // Create one DriveCandidate
+     * const DriveCandidate = await prisma.driveCandidate.create({
+     *   data: {
+     *     // ... data to create a DriveCandidate
+     *   }
+     * })
+     * 
+     */
+    create<T extends DriveCandidateCreateArgs>(args: SelectSubset<T, DriveCandidateCreateArgs<ExtArgs>>): Prisma__DriveCandidateClient<$Result.GetResult<Prisma.$DriveCandidatePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many DriveCandidates.
+     * @param {DriveCandidateCreateManyArgs} args - Arguments to create many DriveCandidates.
+     * @example
+     * // Create many DriveCandidates
+     * const driveCandidate = await prisma.driveCandidate.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends DriveCandidateCreateManyArgs>(args?: SelectSubset<T, DriveCandidateCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many DriveCandidates and returns the data saved in the database.
+     * @param {DriveCandidateCreateManyAndReturnArgs} args - Arguments to create many DriveCandidates.
+     * @example
+     * // Create many DriveCandidates
+     * const driveCandidate = await prisma.driveCandidate.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many DriveCandidates and only return the `id`
+     * const driveCandidateWithIdOnly = await prisma.driveCandidate.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends DriveCandidateCreateManyAndReturnArgs>(args?: SelectSubset<T, DriveCandidateCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DriveCandidatePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a DriveCandidate.
+     * @param {DriveCandidateDeleteArgs} args - Arguments to delete one DriveCandidate.
+     * @example
+     * // Delete one DriveCandidate
+     * const DriveCandidate = await prisma.driveCandidate.delete({
+     *   where: {
+     *     // ... filter to delete one DriveCandidate
+     *   }
+     * })
+     * 
+     */
+    delete<T extends DriveCandidateDeleteArgs>(args: SelectSubset<T, DriveCandidateDeleteArgs<ExtArgs>>): Prisma__DriveCandidateClient<$Result.GetResult<Prisma.$DriveCandidatePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one DriveCandidate.
+     * @param {DriveCandidateUpdateArgs} args - Arguments to update one DriveCandidate.
+     * @example
+     * // Update one DriveCandidate
+     * const driveCandidate = await prisma.driveCandidate.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends DriveCandidateUpdateArgs>(args: SelectSubset<T, DriveCandidateUpdateArgs<ExtArgs>>): Prisma__DriveCandidateClient<$Result.GetResult<Prisma.$DriveCandidatePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more DriveCandidates.
+     * @param {DriveCandidateDeleteManyArgs} args - Arguments to filter DriveCandidates to delete.
+     * @example
+     * // Delete a few DriveCandidates
+     * const { count } = await prisma.driveCandidate.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends DriveCandidateDeleteManyArgs>(args?: SelectSubset<T, DriveCandidateDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more DriveCandidates.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DriveCandidateUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many DriveCandidates
+     * const driveCandidate = await prisma.driveCandidate.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends DriveCandidateUpdateManyArgs>(args: SelectSubset<T, DriveCandidateUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more DriveCandidates and returns the data updated in the database.
+     * @param {DriveCandidateUpdateManyAndReturnArgs} args - Arguments to update many DriveCandidates.
+     * @example
+     * // Update many DriveCandidates
+     * const driveCandidate = await prisma.driveCandidate.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more DriveCandidates and only return the `id`
+     * const driveCandidateWithIdOnly = await prisma.driveCandidate.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends DriveCandidateUpdateManyAndReturnArgs>(args: SelectSubset<T, DriveCandidateUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DriveCandidatePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one DriveCandidate.
+     * @param {DriveCandidateUpsertArgs} args - Arguments to update or create a DriveCandidate.
+     * @example
+     * // Update or create a DriveCandidate
+     * const driveCandidate = await prisma.driveCandidate.upsert({
+     *   create: {
+     *     // ... data to create a DriveCandidate
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the DriveCandidate we want to update
+     *   }
+     * })
+     */
+    upsert<T extends DriveCandidateUpsertArgs>(args: SelectSubset<T, DriveCandidateUpsertArgs<ExtArgs>>): Prisma__DriveCandidateClient<$Result.GetResult<Prisma.$DriveCandidatePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of DriveCandidates.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DriveCandidateCountArgs} args - Arguments to filter DriveCandidates to count.
+     * @example
+     * // Count the number of DriveCandidates
+     * const count = await prisma.driveCandidate.count({
+     *   where: {
+     *     // ... the filter for the DriveCandidates we want to count
+     *   }
+     * })
+    **/
+    count<T extends DriveCandidateCountArgs>(
+      args?: Subset<T, DriveCandidateCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], DriveCandidateCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a DriveCandidate.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DriveCandidateAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends DriveCandidateAggregateArgs>(args: Subset<T, DriveCandidateAggregateArgs>): Prisma.PrismaPromise<GetDriveCandidateAggregateType<T>>
+
+    /**
+     * Group by DriveCandidate.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DriveCandidateGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends DriveCandidateGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: DriveCandidateGroupByArgs['orderBy'] }
+        : { orderBy?: DriveCandidateGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, DriveCandidateGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetDriveCandidateGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the DriveCandidate model
+   */
+  readonly fields: DriveCandidateFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for DriveCandidate.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__DriveCandidateClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    hiringDrive<T extends HiringDriveDefaultArgs<ExtArgs> = {}>(args?: Subset<T, HiringDriveDefaultArgs<ExtArgs>>): Prisma__HiringDriveClient<$Result.GetResult<Prisma.$HiringDrivePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the DriveCandidate model
+   */
+  interface DriveCandidateFieldRefs {
+    readonly id: FieldRef<"DriveCandidate", 'String'>
+    readonly email: FieldRef<"DriveCandidate", 'String'>
+    readonly fullName: FieldRef<"DriveCandidate", 'String'>
+    readonly token: FieldRef<"DriveCandidate", 'String'>
+    readonly status: FieldRef<"DriveCandidate", 'String'>
+    readonly hiringDriveId: FieldRef<"DriveCandidate", 'String'>
+    readonly createdAt: FieldRef<"DriveCandidate", 'DateTime'>
+    readonly updatedAt: FieldRef<"DriveCandidate", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * DriveCandidate findUnique
+   */
+  export type DriveCandidateFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DriveCandidate
+     */
+    select?: DriveCandidateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DriveCandidate
+     */
+    omit?: DriveCandidateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DriveCandidateInclude<ExtArgs> | null
+    /**
+     * Filter, which DriveCandidate to fetch.
+     */
+    where: DriveCandidateWhereUniqueInput
+  }
+
+  /**
+   * DriveCandidate findUniqueOrThrow
+   */
+  export type DriveCandidateFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DriveCandidate
+     */
+    select?: DriveCandidateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DriveCandidate
+     */
+    omit?: DriveCandidateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DriveCandidateInclude<ExtArgs> | null
+    /**
+     * Filter, which DriveCandidate to fetch.
+     */
+    where: DriveCandidateWhereUniqueInput
+  }
+
+  /**
+   * DriveCandidate findFirst
+   */
+  export type DriveCandidateFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DriveCandidate
+     */
+    select?: DriveCandidateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DriveCandidate
+     */
+    omit?: DriveCandidateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DriveCandidateInclude<ExtArgs> | null
+    /**
+     * Filter, which DriveCandidate to fetch.
+     */
+    where?: DriveCandidateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DriveCandidates to fetch.
+     */
+    orderBy?: DriveCandidateOrderByWithRelationInput | DriveCandidateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DriveCandidates.
+     */
+    cursor?: DriveCandidateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DriveCandidates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DriveCandidates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DriveCandidates.
+     */
+    distinct?: DriveCandidateScalarFieldEnum | DriveCandidateScalarFieldEnum[]
+  }
+
+  /**
+   * DriveCandidate findFirstOrThrow
+   */
+  export type DriveCandidateFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DriveCandidate
+     */
+    select?: DriveCandidateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DriveCandidate
+     */
+    omit?: DriveCandidateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DriveCandidateInclude<ExtArgs> | null
+    /**
+     * Filter, which DriveCandidate to fetch.
+     */
+    where?: DriveCandidateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DriveCandidates to fetch.
+     */
+    orderBy?: DriveCandidateOrderByWithRelationInput | DriveCandidateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DriveCandidates.
+     */
+    cursor?: DriveCandidateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DriveCandidates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DriveCandidates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DriveCandidates.
+     */
+    distinct?: DriveCandidateScalarFieldEnum | DriveCandidateScalarFieldEnum[]
+  }
+
+  /**
+   * DriveCandidate findMany
+   */
+  export type DriveCandidateFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DriveCandidate
+     */
+    select?: DriveCandidateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DriveCandidate
+     */
+    omit?: DriveCandidateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DriveCandidateInclude<ExtArgs> | null
+    /**
+     * Filter, which DriveCandidates to fetch.
+     */
+    where?: DriveCandidateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DriveCandidates to fetch.
+     */
+    orderBy?: DriveCandidateOrderByWithRelationInput | DriveCandidateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing DriveCandidates.
+     */
+    cursor?: DriveCandidateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DriveCandidates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DriveCandidates.
+     */
+    skip?: number
+    distinct?: DriveCandidateScalarFieldEnum | DriveCandidateScalarFieldEnum[]
+  }
+
+  /**
+   * DriveCandidate create
+   */
+  export type DriveCandidateCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DriveCandidate
+     */
+    select?: DriveCandidateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DriveCandidate
+     */
+    omit?: DriveCandidateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DriveCandidateInclude<ExtArgs> | null
+    /**
+     * The data needed to create a DriveCandidate.
+     */
+    data: XOR<DriveCandidateCreateInput, DriveCandidateUncheckedCreateInput>
+  }
+
+  /**
+   * DriveCandidate createMany
+   */
+  export type DriveCandidateCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many DriveCandidates.
+     */
+    data: DriveCandidateCreateManyInput | DriveCandidateCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * DriveCandidate createManyAndReturn
+   */
+  export type DriveCandidateCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DriveCandidate
+     */
+    select?: DriveCandidateSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the DriveCandidate
+     */
+    omit?: DriveCandidateOmit<ExtArgs> | null
+    /**
+     * The data used to create many DriveCandidates.
+     */
+    data: DriveCandidateCreateManyInput | DriveCandidateCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DriveCandidateIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * DriveCandidate update
+   */
+  export type DriveCandidateUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DriveCandidate
+     */
+    select?: DriveCandidateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DriveCandidate
+     */
+    omit?: DriveCandidateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DriveCandidateInclude<ExtArgs> | null
+    /**
+     * The data needed to update a DriveCandidate.
+     */
+    data: XOR<DriveCandidateUpdateInput, DriveCandidateUncheckedUpdateInput>
+    /**
+     * Choose, which DriveCandidate to update.
+     */
+    where: DriveCandidateWhereUniqueInput
+  }
+
+  /**
+   * DriveCandidate updateMany
+   */
+  export type DriveCandidateUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update DriveCandidates.
+     */
+    data: XOR<DriveCandidateUpdateManyMutationInput, DriveCandidateUncheckedUpdateManyInput>
+    /**
+     * Filter which DriveCandidates to update
+     */
+    where?: DriveCandidateWhereInput
+    /**
+     * Limit how many DriveCandidates to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * DriveCandidate updateManyAndReturn
+   */
+  export type DriveCandidateUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DriveCandidate
+     */
+    select?: DriveCandidateSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the DriveCandidate
+     */
+    omit?: DriveCandidateOmit<ExtArgs> | null
+    /**
+     * The data used to update DriveCandidates.
+     */
+    data: XOR<DriveCandidateUpdateManyMutationInput, DriveCandidateUncheckedUpdateManyInput>
+    /**
+     * Filter which DriveCandidates to update
+     */
+    where?: DriveCandidateWhereInput
+    /**
+     * Limit how many DriveCandidates to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DriveCandidateIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * DriveCandidate upsert
+   */
+  export type DriveCandidateUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DriveCandidate
+     */
+    select?: DriveCandidateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DriveCandidate
+     */
+    omit?: DriveCandidateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DriveCandidateInclude<ExtArgs> | null
+    /**
+     * The filter to search for the DriveCandidate to update in case it exists.
+     */
+    where: DriveCandidateWhereUniqueInput
+    /**
+     * In case the DriveCandidate found by the `where` argument doesn't exist, create a new DriveCandidate with this data.
+     */
+    create: XOR<DriveCandidateCreateInput, DriveCandidateUncheckedCreateInput>
+    /**
+     * In case the DriveCandidate was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<DriveCandidateUpdateInput, DriveCandidateUncheckedUpdateInput>
+  }
+
+  /**
+   * DriveCandidate delete
+   */
+  export type DriveCandidateDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DriveCandidate
+     */
+    select?: DriveCandidateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DriveCandidate
+     */
+    omit?: DriveCandidateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DriveCandidateInclude<ExtArgs> | null
+    /**
+     * Filter which DriveCandidate to delete.
+     */
+    where: DriveCandidateWhereUniqueInput
+  }
+
+  /**
+   * DriveCandidate deleteMany
+   */
+  export type DriveCandidateDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DriveCandidates to delete
+     */
+    where?: DriveCandidateWhereInput
+    /**
+     * Limit how many DriveCandidates to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * DriveCandidate without action
+   */
+  export type DriveCandidateDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DriveCandidate
+     */
+    select?: DriveCandidateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DriveCandidate
+     */
+    omit?: DriveCandidateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DriveCandidateInclude<ExtArgs> | null
   }
 
 
@@ -4500,6 +5749,20 @@ export namespace Prisma {
   };
 
   export type HiringDriveScalarFieldEnum = (typeof HiringDriveScalarFieldEnum)[keyof typeof HiringDriveScalarFieldEnum]
+
+
+  export const DriveCandidateScalarFieldEnum: {
+    id: 'id',
+    email: 'email',
+    fullName: 'fullName',
+    token: 'token',
+    status: 'status',
+    hiringDriveId: 'hiringDriveId',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type DriveCandidateScalarFieldEnum = (typeof DriveCandidateScalarFieldEnum)[keyof typeof DriveCandidateScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -4748,6 +6011,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"HiringDrive"> | Date | string
     updatedAt?: DateTimeFilter<"HiringDrive"> | Date | string
     organisation?: XOR<OrganisationScalarRelationFilter, OrganisationWhereInput>
+    candidates?: DriveCandidateListRelationFilter
   }
 
   export type HiringDriveOrderByWithRelationInput = {
@@ -4759,6 +6023,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     organisation?: OrganisationOrderByWithRelationInput
+    candidates?: DriveCandidateOrderByRelationAggregateInput
   }
 
   export type HiringDriveWhereUniqueInput = Prisma.AtLeast<{
@@ -4773,6 +6038,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"HiringDrive"> | Date | string
     updatedAt?: DateTimeFilter<"HiringDrive"> | Date | string
     organisation?: XOR<OrganisationScalarRelationFilter, OrganisationWhereInput>
+    candidates?: DriveCandidateListRelationFilter
   }, "id">
 
   export type HiringDriveOrderByWithAggregationInput = {
@@ -4799,6 +6065,77 @@ export namespace Prisma {
     organisationId?: StringWithAggregatesFilter<"HiringDrive"> | string
     createdAt?: DateTimeWithAggregatesFilter<"HiringDrive"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"HiringDrive"> | Date | string
+  }
+
+  export type DriveCandidateWhereInput = {
+    AND?: DriveCandidateWhereInput | DriveCandidateWhereInput[]
+    OR?: DriveCandidateWhereInput[]
+    NOT?: DriveCandidateWhereInput | DriveCandidateWhereInput[]
+    id?: StringFilter<"DriveCandidate"> | string
+    email?: StringFilter<"DriveCandidate"> | string
+    fullName?: StringFilter<"DriveCandidate"> | string
+    token?: StringFilter<"DriveCandidate"> | string
+    status?: StringFilter<"DriveCandidate"> | string
+    hiringDriveId?: StringFilter<"DriveCandidate"> | string
+    createdAt?: DateTimeFilter<"DriveCandidate"> | Date | string
+    updatedAt?: DateTimeFilter<"DriveCandidate"> | Date | string
+    hiringDrive?: XOR<HiringDriveScalarRelationFilter, HiringDriveWhereInput>
+  }
+
+  export type DriveCandidateOrderByWithRelationInput = {
+    id?: SortOrder
+    email?: SortOrder
+    fullName?: SortOrder
+    token?: SortOrder
+    status?: SortOrder
+    hiringDriveId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    hiringDrive?: HiringDriveOrderByWithRelationInput
+  }
+
+  export type DriveCandidateWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    token?: string
+    email_hiringDriveId?: DriveCandidateEmailHiringDriveIdCompoundUniqueInput
+    AND?: DriveCandidateWhereInput | DriveCandidateWhereInput[]
+    OR?: DriveCandidateWhereInput[]
+    NOT?: DriveCandidateWhereInput | DriveCandidateWhereInput[]
+    email?: StringFilter<"DriveCandidate"> | string
+    fullName?: StringFilter<"DriveCandidate"> | string
+    status?: StringFilter<"DriveCandidate"> | string
+    hiringDriveId?: StringFilter<"DriveCandidate"> | string
+    createdAt?: DateTimeFilter<"DriveCandidate"> | Date | string
+    updatedAt?: DateTimeFilter<"DriveCandidate"> | Date | string
+    hiringDrive?: XOR<HiringDriveScalarRelationFilter, HiringDriveWhereInput>
+  }, "id" | "token" | "email_hiringDriveId">
+
+  export type DriveCandidateOrderByWithAggregationInput = {
+    id?: SortOrder
+    email?: SortOrder
+    fullName?: SortOrder
+    token?: SortOrder
+    status?: SortOrder
+    hiringDriveId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: DriveCandidateCountOrderByAggregateInput
+    _max?: DriveCandidateMaxOrderByAggregateInput
+    _min?: DriveCandidateMinOrderByAggregateInput
+  }
+
+  export type DriveCandidateScalarWhereWithAggregatesInput = {
+    AND?: DriveCandidateScalarWhereWithAggregatesInput | DriveCandidateScalarWhereWithAggregatesInput[]
+    OR?: DriveCandidateScalarWhereWithAggregatesInput[]
+    NOT?: DriveCandidateScalarWhereWithAggregatesInput | DriveCandidateScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"DriveCandidate"> | string
+    email?: StringWithAggregatesFilter<"DriveCandidate"> | string
+    fullName?: StringWithAggregatesFilter<"DriveCandidate"> | string
+    token?: StringWithAggregatesFilter<"DriveCandidate"> | string
+    status?: StringWithAggregatesFilter<"DriveCandidate"> | string
+    hiringDriveId?: StringWithAggregatesFilter<"DriveCandidate"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"DriveCandidate"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"DriveCandidate"> | Date | string
   }
 
   export type UserCreateInput = {
@@ -4984,6 +6321,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     organisation: OrganisationCreateNestedOneWithoutDrivesInput
+    candidates?: DriveCandidateCreateNestedManyWithoutHiringDriveInput
   }
 
   export type HiringDriveUncheckedCreateInput = {
@@ -4994,6 +6332,7 @@ export namespace Prisma {
     organisationId: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    candidates?: DriveCandidateUncheckedCreateNestedManyWithoutHiringDriveInput
   }
 
   export type HiringDriveUpdateInput = {
@@ -5004,6 +6343,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organisation?: OrganisationUpdateOneRequiredWithoutDrivesNestedInput
+    candidates?: DriveCandidateUpdateManyWithoutHiringDriveNestedInput
   }
 
   export type HiringDriveUncheckedUpdateInput = {
@@ -5014,6 +6354,7 @@ export namespace Prisma {
     organisationId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    candidates?: DriveCandidateUncheckedUpdateManyWithoutHiringDriveNestedInput
   }
 
   export type HiringDriveCreateManyInput = {
@@ -5041,6 +6382,82 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     organisationId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DriveCandidateCreateInput = {
+    id?: string
+    email: string
+    fullName: string
+    token: string
+    status?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    hiringDrive: HiringDriveCreateNestedOneWithoutCandidatesInput
+  }
+
+  export type DriveCandidateUncheckedCreateInput = {
+    id?: string
+    email: string
+    fullName: string
+    token: string
+    status?: string
+    hiringDriveId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DriveCandidateUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    hiringDrive?: HiringDriveUpdateOneRequiredWithoutCandidatesNestedInput
+  }
+
+  export type DriveCandidateUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    hiringDriveId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DriveCandidateCreateManyInput = {
+    id?: string
+    email: string
+    fullName: string
+    token: string
+    status?: string
+    hiringDriveId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DriveCandidateUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DriveCandidateUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    hiringDriveId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -5256,6 +6673,16 @@ export namespace Prisma {
     isNot?: OrganisationWhereInput
   }
 
+  export type DriveCandidateListRelationFilter = {
+    every?: DriveCandidateWhereInput
+    some?: DriveCandidateWhereInput
+    none?: DriveCandidateWhereInput
+  }
+
+  export type DriveCandidateOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type HiringDriveCountOrderByAggregateInput = {
     id?: SortOrder
     role?: SortOrder
@@ -5282,6 +6709,49 @@ export namespace Prisma {
     description?: SortOrder
     isActive?: SortOrder
     organisationId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type HiringDriveScalarRelationFilter = {
+    is?: HiringDriveWhereInput
+    isNot?: HiringDriveWhereInput
+  }
+
+  export type DriveCandidateEmailHiringDriveIdCompoundUniqueInput = {
+    email: string
+    hiringDriveId: string
+  }
+
+  export type DriveCandidateCountOrderByAggregateInput = {
+    id?: SortOrder
+    email?: SortOrder
+    fullName?: SortOrder
+    token?: SortOrder
+    status?: SortOrder
+    hiringDriveId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DriveCandidateMaxOrderByAggregateInput = {
+    id?: SortOrder
+    email?: SortOrder
+    fullName?: SortOrder
+    token?: SortOrder
+    status?: SortOrder
+    hiringDriveId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DriveCandidateMinOrderByAggregateInput = {
+    id?: SortOrder
+    email?: SortOrder
+    fullName?: SortOrder
+    token?: SortOrder
+    status?: SortOrder
+    hiringDriveId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -5408,12 +6878,68 @@ export namespace Prisma {
     connect?: OrganisationWhereUniqueInput
   }
 
+  export type DriveCandidateCreateNestedManyWithoutHiringDriveInput = {
+    create?: XOR<DriveCandidateCreateWithoutHiringDriveInput, DriveCandidateUncheckedCreateWithoutHiringDriveInput> | DriveCandidateCreateWithoutHiringDriveInput[] | DriveCandidateUncheckedCreateWithoutHiringDriveInput[]
+    connectOrCreate?: DriveCandidateCreateOrConnectWithoutHiringDriveInput | DriveCandidateCreateOrConnectWithoutHiringDriveInput[]
+    createMany?: DriveCandidateCreateManyHiringDriveInputEnvelope
+    connect?: DriveCandidateWhereUniqueInput | DriveCandidateWhereUniqueInput[]
+  }
+
+  export type DriveCandidateUncheckedCreateNestedManyWithoutHiringDriveInput = {
+    create?: XOR<DriveCandidateCreateWithoutHiringDriveInput, DriveCandidateUncheckedCreateWithoutHiringDriveInput> | DriveCandidateCreateWithoutHiringDriveInput[] | DriveCandidateUncheckedCreateWithoutHiringDriveInput[]
+    connectOrCreate?: DriveCandidateCreateOrConnectWithoutHiringDriveInput | DriveCandidateCreateOrConnectWithoutHiringDriveInput[]
+    createMany?: DriveCandidateCreateManyHiringDriveInputEnvelope
+    connect?: DriveCandidateWhereUniqueInput | DriveCandidateWhereUniqueInput[]
+  }
+
   export type OrganisationUpdateOneRequiredWithoutDrivesNestedInput = {
     create?: XOR<OrganisationCreateWithoutDrivesInput, OrganisationUncheckedCreateWithoutDrivesInput>
     connectOrCreate?: OrganisationCreateOrConnectWithoutDrivesInput
     upsert?: OrganisationUpsertWithoutDrivesInput
     connect?: OrganisationWhereUniqueInput
     update?: XOR<XOR<OrganisationUpdateToOneWithWhereWithoutDrivesInput, OrganisationUpdateWithoutDrivesInput>, OrganisationUncheckedUpdateWithoutDrivesInput>
+  }
+
+  export type DriveCandidateUpdateManyWithoutHiringDriveNestedInput = {
+    create?: XOR<DriveCandidateCreateWithoutHiringDriveInput, DriveCandidateUncheckedCreateWithoutHiringDriveInput> | DriveCandidateCreateWithoutHiringDriveInput[] | DriveCandidateUncheckedCreateWithoutHiringDriveInput[]
+    connectOrCreate?: DriveCandidateCreateOrConnectWithoutHiringDriveInput | DriveCandidateCreateOrConnectWithoutHiringDriveInput[]
+    upsert?: DriveCandidateUpsertWithWhereUniqueWithoutHiringDriveInput | DriveCandidateUpsertWithWhereUniqueWithoutHiringDriveInput[]
+    createMany?: DriveCandidateCreateManyHiringDriveInputEnvelope
+    set?: DriveCandidateWhereUniqueInput | DriveCandidateWhereUniqueInput[]
+    disconnect?: DriveCandidateWhereUniqueInput | DriveCandidateWhereUniqueInput[]
+    delete?: DriveCandidateWhereUniqueInput | DriveCandidateWhereUniqueInput[]
+    connect?: DriveCandidateWhereUniqueInput | DriveCandidateWhereUniqueInput[]
+    update?: DriveCandidateUpdateWithWhereUniqueWithoutHiringDriveInput | DriveCandidateUpdateWithWhereUniqueWithoutHiringDriveInput[]
+    updateMany?: DriveCandidateUpdateManyWithWhereWithoutHiringDriveInput | DriveCandidateUpdateManyWithWhereWithoutHiringDriveInput[]
+    deleteMany?: DriveCandidateScalarWhereInput | DriveCandidateScalarWhereInput[]
+  }
+
+  export type DriveCandidateUncheckedUpdateManyWithoutHiringDriveNestedInput = {
+    create?: XOR<DriveCandidateCreateWithoutHiringDriveInput, DriveCandidateUncheckedCreateWithoutHiringDriveInput> | DriveCandidateCreateWithoutHiringDriveInput[] | DriveCandidateUncheckedCreateWithoutHiringDriveInput[]
+    connectOrCreate?: DriveCandidateCreateOrConnectWithoutHiringDriveInput | DriveCandidateCreateOrConnectWithoutHiringDriveInput[]
+    upsert?: DriveCandidateUpsertWithWhereUniqueWithoutHiringDriveInput | DriveCandidateUpsertWithWhereUniqueWithoutHiringDriveInput[]
+    createMany?: DriveCandidateCreateManyHiringDriveInputEnvelope
+    set?: DriveCandidateWhereUniqueInput | DriveCandidateWhereUniqueInput[]
+    disconnect?: DriveCandidateWhereUniqueInput | DriveCandidateWhereUniqueInput[]
+    delete?: DriveCandidateWhereUniqueInput | DriveCandidateWhereUniqueInput[]
+    connect?: DriveCandidateWhereUniqueInput | DriveCandidateWhereUniqueInput[]
+    update?: DriveCandidateUpdateWithWhereUniqueWithoutHiringDriveInput | DriveCandidateUpdateWithWhereUniqueWithoutHiringDriveInput[]
+    updateMany?: DriveCandidateUpdateManyWithWhereWithoutHiringDriveInput | DriveCandidateUpdateManyWithWhereWithoutHiringDriveInput[]
+    deleteMany?: DriveCandidateScalarWhereInput | DriveCandidateScalarWhereInput[]
+  }
+
+  export type HiringDriveCreateNestedOneWithoutCandidatesInput = {
+    create?: XOR<HiringDriveCreateWithoutCandidatesInput, HiringDriveUncheckedCreateWithoutCandidatesInput>
+    connectOrCreate?: HiringDriveCreateOrConnectWithoutCandidatesInput
+    connect?: HiringDriveWhereUniqueInput
+  }
+
+  export type HiringDriveUpdateOneRequiredWithoutCandidatesNestedInput = {
+    create?: XOR<HiringDriveCreateWithoutCandidatesInput, HiringDriveUncheckedCreateWithoutCandidatesInput>
+    connectOrCreate?: HiringDriveCreateOrConnectWithoutCandidatesInput
+    upsert?: HiringDriveUpsertWithoutCandidatesInput
+    connect?: HiringDriveWhereUniqueInput
+    update?: XOR<XOR<HiringDriveUpdateToOneWithWhereWithoutCandidatesInput, HiringDriveUpdateWithoutCandidatesInput>, HiringDriveUncheckedUpdateWithoutCandidatesInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -5641,6 +7167,7 @@ export namespace Prisma {
     isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    candidates?: DriveCandidateCreateNestedManyWithoutHiringDriveInput
   }
 
   export type HiringDriveUncheckedCreateWithoutOrganisationInput = {
@@ -5650,6 +7177,7 @@ export namespace Prisma {
     isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    candidates?: DriveCandidateUncheckedCreateNestedManyWithoutHiringDriveInput
   }
 
   export type HiringDriveCreateOrConnectWithoutOrganisationInput = {
@@ -5751,6 +7279,36 @@ export namespace Prisma {
     create: XOR<OrganisationCreateWithoutDrivesInput, OrganisationUncheckedCreateWithoutDrivesInput>
   }
 
+  export type DriveCandidateCreateWithoutHiringDriveInput = {
+    id?: string
+    email: string
+    fullName: string
+    token: string
+    status?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DriveCandidateUncheckedCreateWithoutHiringDriveInput = {
+    id?: string
+    email: string
+    fullName: string
+    token: string
+    status?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DriveCandidateCreateOrConnectWithoutHiringDriveInput = {
+    where: DriveCandidateWhereUniqueInput
+    create: XOR<DriveCandidateCreateWithoutHiringDriveInput, DriveCandidateUncheckedCreateWithoutHiringDriveInput>
+  }
+
+  export type DriveCandidateCreateManyHiringDriveInputEnvelope = {
+    data: DriveCandidateCreateManyHiringDriveInput | DriveCandidateCreateManyHiringDriveInput[]
+    skipDuplicates?: boolean
+  }
+
   export type OrganisationUpsertWithoutDrivesInput = {
     update: XOR<OrganisationUpdateWithoutDrivesInput, OrganisationUncheckedUpdateWithoutDrivesInput>
     create: XOR<OrganisationCreateWithoutDrivesInput, OrganisationUncheckedCreateWithoutDrivesInput>
@@ -5782,6 +7340,92 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: UserUncheckedUpdateManyWithoutOrganisationNestedInput
+  }
+
+  export type DriveCandidateUpsertWithWhereUniqueWithoutHiringDriveInput = {
+    where: DriveCandidateWhereUniqueInput
+    update: XOR<DriveCandidateUpdateWithoutHiringDriveInput, DriveCandidateUncheckedUpdateWithoutHiringDriveInput>
+    create: XOR<DriveCandidateCreateWithoutHiringDriveInput, DriveCandidateUncheckedCreateWithoutHiringDriveInput>
+  }
+
+  export type DriveCandidateUpdateWithWhereUniqueWithoutHiringDriveInput = {
+    where: DriveCandidateWhereUniqueInput
+    data: XOR<DriveCandidateUpdateWithoutHiringDriveInput, DriveCandidateUncheckedUpdateWithoutHiringDriveInput>
+  }
+
+  export type DriveCandidateUpdateManyWithWhereWithoutHiringDriveInput = {
+    where: DriveCandidateScalarWhereInput
+    data: XOR<DriveCandidateUpdateManyMutationInput, DriveCandidateUncheckedUpdateManyWithoutHiringDriveInput>
+  }
+
+  export type DriveCandidateScalarWhereInput = {
+    AND?: DriveCandidateScalarWhereInput | DriveCandidateScalarWhereInput[]
+    OR?: DriveCandidateScalarWhereInput[]
+    NOT?: DriveCandidateScalarWhereInput | DriveCandidateScalarWhereInput[]
+    id?: StringFilter<"DriveCandidate"> | string
+    email?: StringFilter<"DriveCandidate"> | string
+    fullName?: StringFilter<"DriveCandidate"> | string
+    token?: StringFilter<"DriveCandidate"> | string
+    status?: StringFilter<"DriveCandidate"> | string
+    hiringDriveId?: StringFilter<"DriveCandidate"> | string
+    createdAt?: DateTimeFilter<"DriveCandidate"> | Date | string
+    updatedAt?: DateTimeFilter<"DriveCandidate"> | Date | string
+  }
+
+  export type HiringDriveCreateWithoutCandidatesInput = {
+    id?: string
+    role: string
+    description?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    organisation: OrganisationCreateNestedOneWithoutDrivesInput
+  }
+
+  export type HiringDriveUncheckedCreateWithoutCandidatesInput = {
+    id?: string
+    role: string
+    description?: string | null
+    isActive?: boolean
+    organisationId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type HiringDriveCreateOrConnectWithoutCandidatesInput = {
+    where: HiringDriveWhereUniqueInput
+    create: XOR<HiringDriveCreateWithoutCandidatesInput, HiringDriveUncheckedCreateWithoutCandidatesInput>
+  }
+
+  export type HiringDriveUpsertWithoutCandidatesInput = {
+    update: XOR<HiringDriveUpdateWithoutCandidatesInput, HiringDriveUncheckedUpdateWithoutCandidatesInput>
+    create: XOR<HiringDriveCreateWithoutCandidatesInput, HiringDriveUncheckedCreateWithoutCandidatesInput>
+    where?: HiringDriveWhereInput
+  }
+
+  export type HiringDriveUpdateToOneWithWhereWithoutCandidatesInput = {
+    where?: HiringDriveWhereInput
+    data: XOR<HiringDriveUpdateWithoutCandidatesInput, HiringDriveUncheckedUpdateWithoutCandidatesInput>
+  }
+
+  export type HiringDriveUpdateWithoutCandidatesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    role?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    organisation?: OrganisationUpdateOneRequiredWithoutDrivesNestedInput
+  }
+
+  export type HiringDriveUncheckedUpdateWithoutCandidatesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    role?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    organisationId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type UserCreateManyOrganisationInput = {
@@ -5852,6 +7496,7 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    candidates?: DriveCandidateUpdateManyWithoutHiringDriveNestedInput
   }
 
   export type HiringDriveUncheckedUpdateWithoutOrganisationInput = {
@@ -5861,6 +7506,7 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    candidates?: DriveCandidateUncheckedUpdateManyWithoutHiringDriveNestedInput
   }
 
   export type HiringDriveUncheckedUpdateManyWithoutOrganisationInput = {
@@ -5868,6 +7514,46 @@ export namespace Prisma {
     role?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DriveCandidateCreateManyHiringDriveInput = {
+    id?: string
+    email: string
+    fullName: string
+    token: string
+    status?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DriveCandidateUpdateWithoutHiringDriveInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DriveCandidateUncheckedUpdateWithoutHiringDriveInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DriveCandidateUncheckedUpdateManyWithoutHiringDriveInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

@@ -79,8 +79,32 @@ model HiringDrive {
   organisationId String
   organisation   Organisation @relation(fields: [organisationId], references: [id])
 
+  // Candidates relations
+  candidates     DriveCandidate[]
+
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
   @@map("hiring_drives")
+}
+
+// ─────────────────────────────────────────────
+// Drive Candidate
+// Candidates imported for a specific hiring drive.
+// ─────────────────────────────────────────────
+model DriveCandidate {
+  id             String   @id @default(uuid())
+  email          String
+  fullName       String
+  token          String   @unique
+  status         String   @default("IMPORTED") // e.g. "IMPORTED", "INVITED", "COMPLETED"
+  
+  hiringDriveId  String
+  hiringDrive    HiringDrive @relation(fields: [hiringDriveId], references: [id])
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([email, hiringDriveId])
+  @@map("drive_candidates")
 }
