@@ -2,6 +2,12 @@ const crypto = require("crypto");
 const { prisma } = require("../../lib/prismaClient");
 const { validateOrganisationSetup } = require("./org.validators");
 
+/**
+ * Generates a random alphanumeric code of length 8.
+ * Ensures at least one digit and one special character for complexity.
+ * 
+ * @returns {string} - The generated code.
+ */
 function generateValidOrgCode() {
   const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   const digits = "0123456789";
@@ -26,6 +32,13 @@ function generateValidOrgCode() {
   return codeArr.join("");
 }
 
+/**
+ * Attempts to generate a unique organization code.
+ * Retries up to 10 times to avoid collisions.
+ * 
+ * @throws {Error} - If a unique code cannot be generated after 10 attempts.
+ * @returns {Promise<string>} - A unique organization code.
+ */
 async function generateUniqueOrgCode() {
   let isUnique = false;
   let code = "";
@@ -46,6 +59,17 @@ async function generateUniqueOrgCode() {
   return code;
 }
 
+/**
+ * Handles organization setup: either CREATE a new one or JOIN an existing one.
+ * If CREATE: Generates an orgCode, creates the Organisation, and sets user as OWNER.
+ * If JOIN: Validates orgCode, links user to Organisation, and sets user as MEMBER.
+ * 
+ * @param {Object} req - Express request object.
+ * @param {Object} req.body - { action: 'CREATE'|'JOIN', name, description, category, orgCode }
+ * @param {Object} req.user - The authenticated user object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<Object>} - 201/200 on success, or 400/404/409/500 on error.
+ */
 async function setupOrganisation(req, res) {
   const userId = req.user.id;
   

@@ -32,6 +32,15 @@ function excludePassword(user) {
 
 // ─── Manual Auth ─────────────────────────────────────────────────────────────
 
+/**
+ * Handles manual user registration using email and password.
+ * Performs validation, checks for existing users, and hashes the password.
+ * 
+ * @param {Object} req - Express request object.
+ * @param {Object} req.body - { fullName, email, password }
+ * @param {Object} res - Express response object.
+ * @returns {Promise<Object>} - 201 with token and user data, or 400/500 on error.
+ */
 async function manualSignup(req, res) {
   const errors = validateManualSignup(req.body);
   if (errors.length > 0) {
@@ -76,6 +85,15 @@ async function manualSignup(req, res) {
   }
 }
 
+/**
+ * Handles manual user login using email and password.
+ * Compares hashed password and generates a JWT.
+ * 
+ * @param {Object} req - Express request object.
+ * @param {Object} req.body - { email, password }
+ * @param {Object} res - Express response object.
+ * @returns {Promise<Object>} - 200 with token and user data, or 401/500 on error.
+ */
 async function manualLogin(req, res) {
   const errors = validateManualLogin(req.body);
   if (errors.length > 0) {
@@ -114,6 +132,16 @@ async function manualLogin(req, res) {
 
 // ─── OAuth Auth ──────────────────────────────────────────────────────────────
 
+/**
+ * Handles OAuth-based authentication (Supabase integration).
+ * Supports both signup and login. If the user exists via email but not
+ * supabaseUserId, it links the accounts.
+ * 
+ * @param {Object} req - Express request object.
+ * @param {Object} req.body - { supabaseUserId, email, fullName, oauthProvider }
+ * @param {Object} res - Express response object.
+ * @returns {Promise<Object>} - 200 with token and user data, or 400/500 on error.
+ */
 async function oauthAuth(req, res) {
   const errors = validateOAuth(req.body);
   if (errors.length > 0) {

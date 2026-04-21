@@ -1,3 +1,11 @@
+/**
+ * @module DriveRoutes
+ * @description Defines all Express routes related to the Hiring Drive feature.
+ * These endpoints allow authenticated users belonging to an organization to create drives,
+ * import candidates, retrieve candidate lists, and dispatch interview simulation links.
+ * 
+ * Middleware: Requires `authenticateUser` for all routes.
+ */
 const express = require("express");
 const { 
   createHiringDrive, 

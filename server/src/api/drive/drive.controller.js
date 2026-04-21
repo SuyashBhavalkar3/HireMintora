@@ -2,6 +2,18 @@ const crypto = require("crypto");
 const { PrismaClient } = require("../../generated/prisma-client");
 const prisma = new PrismaClient();
 
+/**
+ * Creates a new Hiring Drive for the authenticated user's organization.
+ * 
+ * @param {Object} req - Express request object.
+ * @param {Object} req.body - The request body.
+ * @param {string} req.body.role - The role the hiring drive is for (e.g., Software Engineer).
+ * @param {string} [req.body.description] - Optional description of the hiring drive.
+ * @param {Object} req.user - The authenticated user object set by the auth middleware.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<Object>} JSON response confirming creation or describing an error.
+ */
+
 const createHiringDrive = async (req, res) => {
   try {
     const { role, description } = req.body;
@@ -39,8 +51,17 @@ const createHiringDrive = async (req, res) => {
 };
 
 /**
- * Import candidates into a hiring drive
- * Request body: { candidates: [{ email, fullName }, ...] }
+ * Imports a batch of candidates into a specific hiring drive.
+ * Generates a unique secure token for each candidate to be used for isolated assessment access.
+ * 
+ * @param {Object} req - Express request object.
+ * @param {Object} req.params - The route parameters.
+ * @param {string} req.params.id - The UUID of the hiring drive.
+ * @param {Object} req.body - The request body.
+ * @param {Array<{email: string, fullName: string}>} req.body.candidates - List of candidates to import.
+ * @param {Object} req.user - The authenticated user object (must belong to the drive's organization).
+ * @param {Object} res - Express response object.
+ * @returns {Promise<Object>} JSON response containing processed candidates and any errors encountered.
  */
 const importCandidates = async (req, res) => {
   try {
@@ -122,7 +143,14 @@ const importCandidates = async (req, res) => {
 };
 
 /**
- * Get all candidates for a specific drive
+ * Retrieves all candidates associated with a specific hiring drive.
+ * Ordered descending by their creation date.
+ * 
+ * @param {Object} req - Express request object.
+ * @param {Object} req.params - The route parameters.
+ * @param {string} req.params.id - The UUID of the hiring drive.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<Object>} JSON response containing the drive ID and array of candidate objects.
  */
 const getDriveCandidates = async (req, res) => {
   try {
@@ -149,8 +177,15 @@ const getDriveCandidates = async (req, res) => {
 };
 
 /**
- * Mock send links to all candidates
- * In real scenario, this would trigger SMTP/Mail service
+ * Mocks the process of sending unique interview links to all imported candidates in a drive.
+ * In a production scenario, this function should integrate with an SMTP or third-party mailing service (e.g. SendGrid)
+ * to email the unique token link to each candidate. Updates the status to 'INVITED'.
+ * 
+ * @param {Object} req - Express request object.
+ * @param {Object} req.params - The route parameters.
+ * @param {string} req.params.id - The UUID of the hiring drive.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<Object>} JSON response summarizing the number of invitations sent.
  */
 const sendLinksToAll = async (req, res) => {
   try {

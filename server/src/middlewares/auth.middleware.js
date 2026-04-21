@@ -3,6 +3,18 @@ const { prisma } = require("../lib/prismaClient");
 
 const JWT_SECRET = process.env.JWT_SECRET || "change_me_in_production";
 
+/**
+ * Authentication Middleware
+ * 
+ * Verifies the Bearer JWT token in the Authorization header.
+ * If valid, it fetches the corresponding user from the database, 
+ * ensures the account is active, and attaches the user object to `req.user`.
+ * 
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @param {Function} next - Express next middleware function.
+ * @returns {Promise<void>} - Responds with 401/403 if unauthorized, otherwise calls next().
+ */
 async function authenticateUser(req, res, next) {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith("Bearer ")) {

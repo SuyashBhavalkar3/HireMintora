@@ -1,3 +1,9 @@
+/**
+ * @file server.js
+ * @description Entry point for the HireMintora Express server.
+ * Initializes middleware (CORS, JSON parsing), API routes (Auth, Org, Drive),
+ * Swagger documentation, and the WebSocket server for real-time interview simulations.
+ */
 require("dotenv").config();
 
 const express = require("express");
