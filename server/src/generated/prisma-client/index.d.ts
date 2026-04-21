@@ -15,22 +15,23 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
 
 /**
  * Model User
- * 
+ * User represents an HR / Employer account.
+ * Supports both Manual (email/password) and OAuth (Supabase) authentication.
  */
 export type User = $Result.DefaultSelection<Prisma.$UserPayload>
 /**
  * Model Organisation
- * 
+ * Organisation represents a workspace or business entity created or joined by HR users.
  */
 export type Organisation = $Result.DefaultSelection<Prisma.$OrganisationPayload>
 /**
  * Model HiringDrive
- * 
+ * HiringDrive represents a specific recruitment campaign for a role (e.g., "SWE Intern 2026").
  */
 export type HiringDrive = $Result.DefaultSelection<Prisma.$HiringDrivePayload>
 /**
  * Model DriveCandidate
- * 
+ * DriveCandidate represents a candidate imported into a specific hiring drive.
  */
 export type DriveCandidate = $Result.DefaultSelection<Prisma.$DriveCandidatePayload>
 
@@ -1480,16 +1481,43 @@ export namespace Prisma {
       organisation: Prisma.$OrganisationPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
+      /**
+       * Unique identifier for the user (UUID).
+       */
       id: string
+      /**
+       * Full name of the HR user.
+       */
       fullName: string
+      /**
+       * Canonical unique identifier (Email).
+       */
       email: string
+      /**
+       * Manual auth: Hashed password (nullable for OAuth-only users).
+       */
       passwordHash: string | null
+      /**
+       * OAuth: Unique ID from Supabase (nullable for manual-only users).
+       */
       supabaseUserId: string | null
+      /**
+       * OAuth provider name (e.g., "google", "github").
+       */
       oauthProvider: string | null
+      /**
+       * Whether the account is active and allowed to log in.
+       */
       isActive: boolean
       createdAt: Date
       updatedAt: Date
+      /**
+       * Link to the user's organization.
+       */
       organisationId: string | null
+      /**
+       * The user's role within the organization: 'OWNER' or 'MEMBER'.
+       */
       organisationRole: string | null
     }, ExtArgs["result"]["user"]>
     composites: {}
@@ -2586,14 +2614,32 @@ export namespace Prisma {
   export type $OrganisationPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Organisation"
     objects: {
+      /**
+       * All HR members belonging to this organization.
+       */
       members: Prisma.$UserPayload<ExtArgs>[]
+      /**
+       * All hiring drives conducted by this organization.
+       */
       drives: Prisma.$HiringDrivePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
+      /**
+       * Display name of the company or institution.
+       */
       name: string
+      /**
+       * Optional tagline or description.
+       */
       description: string | null
+      /**
+       * Business category (e.g., "Startup", "Enterprise").
+       */
       category: string
+      /**
+       * Unique referral/join code for this organization.
+       */
       orgCode: string
       createdAt: Date
       updatedAt: Date
@@ -3717,13 +3763,28 @@ export namespace Prisma {
     name: "HiringDrive"
     objects: {
       organisation: Prisma.$OrganisationPayload<ExtArgs>
+      /**
+       * List of candidates invited to or imported for this drive.
+       */
       candidates: Prisma.$DriveCandidatePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
+      /**
+       * The job role name.
+       */
       role: string
+      /**
+       * Description of the drive or role requirements.
+       */
       description: string | null
+      /**
+       * Whether the drive is currently accepting candidates or active.
+       */
       isActive: boolean
+      /**
+       * The organization that owns this drive.
+       */
       organisationId: string
       createdAt: Date
       updatedAt: Date
@@ -4841,10 +4902,25 @@ export namespace Prisma {
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
+      /**
+       * Candidate's email address.
+       */
       email: string
+      /**
+       * Candidate's full name.
+       */
       fullName: string
+      /**
+       * Unique secure token used for candidate assessment access.
+       */
       token: string
+      /**
+       * Current status of the candidate (e.g., "IMPORTED", "INVITED", "COMPLETED").
+       */
       status: string
+      /**
+       * The hiring drive this candidate belongs to.
+       */
       hiringDriveId: string
       createdAt: Date
       updatedAt: Date

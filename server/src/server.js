@@ -11,6 +11,7 @@ const cors = require("cors");
 const http = require("http");
 const path = require("path");
 const fs = require("fs");
+const { execSync } = require("child_process");
 const { createInterviewWebSocketServer } = require("./websocket");
 const { swaggerUi, specs } = require("./swagger");
 const { userAuthRouter, organisationRouter, driveRouter } = require("./api");
@@ -63,6 +64,20 @@ app.get("/health", (_req, res) => {
   res.status(200).json({ ok: true });
 });
 
+// Function to ensure database tables are created
+async function ensureDatabaseTables() {
+  try {
+    console.log("Ensuring database tables are created...");
+    // Run prisma migrate deploy to apply any pending migrations
+    execSync("npx prisma migrate deploy", { stdio: "inherit", cwd: path.join(__dirname, "..") });
+    console.log("Database tables are ready.");
+  } catch (error) {
+    console.error("Error ensuring database tables:", error);
+    // Don't exit the process, just log the error
+    // In production, you might want to handle this differently
+  }
+}
+
 const httpServer = http.createServer(app);
 
 createInterviewWebSocketServer(httpServer, {
@@ -70,7 +85,14 @@ createInterviewWebSocketServer(httpServer, {
 });
 
 const PORT = Number(process.env.PORT || 3000);
-httpServer.listen(PORT, () => {
-  // eslint-disable-next-line no-console
-  console.log(`Server running on http://localhost:${PORT}`);
+
+// Ensure database tables exist before starting the server
+ensureDatabaseTables().then(() => {
+  httpServer.listen(PORT, () => {
+    // eslint-disable-next-line no-console
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
+}).catch((error) => {
+  console.error("Failed to initialize database:", error);
+  process.exit(1);
 });
