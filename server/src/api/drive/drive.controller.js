@@ -1,6 +1,11 @@
+/**
+ * @file drive.controller.js
+ * @description Controller for all Hiring Drive operations:
+ * creating drives, importing candidates, listing candidates, and dispatching invitations.
+ * All routes in this controller require the `authenticateUser` middleware.
+ */
 const crypto = require("crypto");
-const { PrismaClient } = require("../../generated/prisma-client");
-const prisma = new PrismaClient();
+const { prisma } = require("../../lib/prismaClient");
 
 /**
  * Creates a new Hiring Drive for the authenticated user's organization.
@@ -114,7 +119,8 @@ const importCandidates = async (req, res) => {
           },
           update: {
             fullName,
-            token // Refresh token or keep old? The user said store token id for all student mapping to mail id
+            // Regenerate the token on re-import to allow access-link refresh.
+            token
           },
           create: {
             email,
@@ -162,6 +168,16 @@ const getDriveCandidates = async (req, res) => {
 
     if (!drive) {
       return res.status(404).json({ error: "Hiring drive not found" });
+    }
+
+    // Ensure the requesting user belongs to the drive's organisation
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.id },
+      select: { organisationId: true }
+    });
+
+    if (!user || user.organisationId !== drive.organisationId) {
+      return res.status(403).json({ error: "You do not have permission to view candidates for this drive" });
     }
 
     const candidates = await prisma.driveCandidate.findMany({
