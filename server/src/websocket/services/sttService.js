@@ -27,35 +27,15 @@ function buildWavFromPcm16Mono(pcmBuffer, sampleRate) {
 }
 
 function normalizeAudioPayload(audioBase64, encoding, sampleRate) {
-  const normalizedEncoding = String(encoding || "").toLowerCase();
-  const isPcm =
-    normalizedEncoding === "pcm_s16le" ||
-    normalizedEncoding === "pcm_l16" ||
-    normalizedEncoding === "pcm_raw";
-
-  if (!isPcm) {
-    return {
-      audio: audioBase64,
-      encoding: normalizedEncoding || "audio/wav",
-      sampleRate,
-    };
-  }
-
-  try {
-    const pcmBuffer = Buffer.from(audioBase64, "base64");
-    const wavBuffer = buildWavFromPcm16Mono(pcmBuffer, sampleRate);
-    return {
-      audio: wavBuffer.toString("base64"),
-      encoding: "audio/wav",
-      sampleRate,
-    };
-  } catch (_error) {
-    return {
-      audio: audioBase64,
-      encoding: "audio/wav",
-      sampleRate,
-    };
-  }
+  // Sarvam's backend has a strict Pydantic validation on the JSON payload
+  // that requires `encoding: 'audio/wav'` exactly, even when the socket
+  // was connected with `input_audio_codec: 'pcm_s16le'`.
+  // We pass the raw PCM data but fake the encoding string to bypass this.
+  return {
+    audio: audioBase64,
+    encoding: "audio/wav",
+    sampleRate,
+  };
 }
 
 function extractProviderError(message) {

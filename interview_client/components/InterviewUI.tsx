@@ -14,6 +14,9 @@ export default function InterviewUI({ tokenId }: { tokenId: string }) {
   const [status, setStatus] = useState<"DISCONNECTED" | "CONNECTING" | "LISTENING" | "PROCESSING" | "SPEAKING">("DISCONNECTED");
   const [messages, setMessages] = useState<Message[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [isFinishing, setIsFinishing] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [hasStarted, setHasStarted] = useState(false);
   
   const ws = useRef<WebSocket | null>(null);
   const mediaRecorder = useRef<MediaRecorder | null>(null);
@@ -22,13 +25,15 @@ export default function InterviewUI({ tokenId }: { tokenId: string }) {
   const isPlayingAudio = useRef<boolean>(false);
   const nextAudioElement = useRef<HTMLAudioElement | null>(null);
 
-  // Auto-connect on mount
+  // Connect when user starts the interview
   useEffect(() => {
-    connectWebSocket();
+    if (hasStarted) {
+      connectWebSocket();
+    }
     return () => {
       disconnect();
     };
-  }, [tokenId]);
+  }, [hasStarted, tokenId]);
 
   const connectWebSocket = () => {
     if (ws.current) return;
@@ -44,7 +49,13 @@ export default function InterviewUI({ tokenId }: { tokenId: string }) {
     
     socket.onopen = () => {
       setStatus("LISTENING");
-      startRecording();
+      // Trigger AI to start the conversation
+      socket.send(JSON.stringify({
+        type: "text_answer",
+        payload: {
+          text: "Hello, I am ready. Please introduce yourself and start the interview."
+        }
+      }));
     };
     
     socket.onmessage = (event) => {
@@ -83,10 +94,17 @@ export default function InterviewUI({ tokenId }: { tokenId: string }) {
     
     if (type === "state_change") {
       setStatus(payload.state as any);
-      if (payload.state === "LISTENING") {
-        startRecording();
-      } else {
+      setIsFinishing(false);
+      
+      if (payload.error) {
+        setError(payload.error);
+      } else if (payload.reason !== "stt_error" && payload.reason !== "processing_error" && payload.reason !== "code_evaluation_error") {
+        setError(null);
+      }
+
+      if (payload.state !== "LISTENING") {
         stopRecording();
+        setIsRecording(false);
       }
     }
     
@@ -103,7 +121,7 @@ export default function InterviewUI({ tokenId }: { tokenId: string }) {
       setMessages(prev => {
         const existing = prev.find(m => m.id === payload.turnId && m.role === "bot");
         if (existing) {
-          return prev.map(m => m.id === payload.turnId ? { ...m, text: m.text + payload.text } : m);
+          return prev.map(m => (m.id === payload.turnId && m.role === "bot") ? { ...m, text: m.text + payload.text } : m);
         } else {
           return [...prev, { id: payload.turnId, role: "bot", text: payload.text, isPartial: true }];
         }
@@ -117,52 +135,75 @@ export default function InterviewUI({ tokenId }: { tokenId: string }) {
 
   const updateMessage = (id: string, role: "bot"|"user", text: string, isPartial: boolean) => {
     setMessages(prev => {
-      const existing = prev.find(m => m.id === id);
+      const existing = prev.find(m => m.id === id && m.role === role);
       if (existing) {
-        return prev.map(m => m.id === id ? { ...m, text, isPartial } : m);
+        return prev.map(m => (m.id === id && m.role === role) ? { ...m, text, isPartial } : m);
       }
       return [...prev, { id, role, text, isPartial }];
     });
   };
 
   const startRecording = async () => {
-    if (mediaRecorder.current && mediaRecorder.current.state === "recording") return;
+    if (audioContext.current) return;
     
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mimeType = 'audio/webm;codecs=opus';
       
-      const recorder = new MediaRecorder(stream, { mimeType });
+      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 16000 });
+      audioContext.current = audioCtx;
       
-      recorder.ondataavailable = async (e) => {
-        if (e.data.size > 0 && ws.current?.readyState === WebSocket.OPEN) {
-          const buffer = await e.data.arrayBuffer();
-          const base64Audio = btoa(String.fromCharCode(...new Uint8Array(buffer)));
+      await audioCtx.audioWorklet.addModule('/audio-processor.js');
+      
+      const source = audioCtx.createMediaStreamSource(stream);
+      const processor = new AudioWorkletNode(audioCtx, 'pcm-processor');
+      
+      processor.port.onmessage = (e) => {
+        if (ws.current?.readyState === WebSocket.OPEN) {
+          const buffer = new Uint8Array(e.data);
+          let binary = '';
+          for (let i = 0; i < buffer.byteLength; i++) {
+            binary += String.fromCharCode(buffer[i]);
+          }
+          const base64Audio = btoa(binary);
           
           ws.current.send(JSON.stringify({
             type: "audio_chunk",
             payload: {
               audio: base64Audio,
-              encoding: mimeType,
-              sampleRate: 48000
+              encoding: "pcm_s16le",
+              sampleRate: 16000
             }
           }));
         }
       };
       
-      recorder.start(250); // Send chunk every 250ms
-      mediaRecorder.current = recorder;
+      source.connect(processor);
+      processor.connect(audioCtx.destination);
+      
+      mediaRecorder.current = {
+        state: "recording",
+        stream: stream,
+        source: source,
+        processor: processor
+      } as any;
     } catch (err) {
-      console.error("Mic access denied", err);
-      setError("Please allow microphone access to proceed with the interview.");
+      console.error("Mic access denied or worklet error", err);
+      setError("Failed to access microphone or load audio processor.");
     }
   };
 
   const stopRecording = () => {
-    if (mediaRecorder.current && mediaRecorder.current.state === "recording") {
-      mediaRecorder.current.stop();
-      mediaRecorder.current.stream.getTracks().forEach(t => t.stop());
+    if (mediaRecorder.current) {
+      const { stream, source, processor } = mediaRecorder.current as any;
+      if (processor) processor.disconnect();
+      if (source) source.disconnect();
+      if (stream) stream.getTracks().forEach((t: any) => t.stop());
       mediaRecorder.current = null;
+      
+      if (audioContext.current) {
+        audioContext.current.close();
+        audioContext.current = null;
+      }
       
       if (ws.current?.readyState === WebSocket.OPEN) {
         ws.current.send(JSON.stringify({ type: "audio_end" }));
@@ -179,6 +220,17 @@ export default function InterviewUI({ tokenId }: { tokenId: string }) {
         nextAudioElement.current.pause();
       }
     }
+  };
+
+  const handleStartSpeaking = () => {
+    setIsRecording(true);
+    startRecording();
+  };
+
+  const handleDoneSpeaking = () => {
+    setIsRecording(false);
+    setIsFinishing(true);
+    stopRecording();
   };
 
   const playAudio = (base64Audio: string) => {
@@ -222,6 +274,29 @@ export default function InterviewUI({ tokenId }: { tokenId: string }) {
       processAudioQueue();
     }
   };
+
+  if (!hasStarted) {
+    return (
+      <div className="flex flex-col h-screen bg-[#f9fafb] items-center justify-center p-6">
+        <div className="bg-white p-10 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 max-w-md w-full text-center">
+          <div className="w-20 h-20 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm">
+            <Mic className="w-10 h-10" />
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-3 tracking-tight">Ready for your Interview?</h1>
+          <p className="text-gray-500 mb-8 leading-relaxed">
+            The AI interviewer will greet you when you start. Please ensure your microphone is working and you are in a quiet environment.
+          </p>
+          <button
+            onClick={() => setHasStarted(true)}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-sm hover:shadow-md"
+          >
+            <Play className="w-5 h-5" />
+            Start Interview
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-screen bg-[#f9fafb]">
@@ -302,14 +377,48 @@ export default function InterviewUI({ tokenId }: { tokenId: string }) {
       </div>
 
       {/* Footer Visualizer Area */}
-      <div className="p-6 bg-white border-t border-[#e5e7eb] flex justify-center items-center h-24 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-10">
+      <div className="p-6 bg-white border-t border-[#e5e7eb] flex justify-center items-center h-24 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-10 relative">
         {status === "LISTENING" ? (
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-600 animate-pulse shadow-sm">
-              <Mic className="w-5 h-5" />
+          isRecording ? (
+            <div className="flex items-center gap-6 w-full max-w-lg justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-600 animate-pulse shadow-sm">
+                  <Mic className="w-5 h-5" />
+                </div>
+                <p className="text-sm font-semibold text-gray-600">
+                  Recording your voice...
+                </p>
+              </div>
+              
+              <button 
+                onClick={handleDoneSpeaking} 
+                className="btn btn-primary bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+              >
+                <Square className="w-4 h-4" />
+                Stop & Submit
+              </button>
             </div>
-            <p className="text-sm font-semibold text-gray-600">Recording your voice...</p>
-          </div>
+          ) : (
+            <div className="flex items-center gap-6 w-full max-w-lg justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 shadow-sm">
+                  <Mic className="w-5 h-5" />
+                </div>
+                <p className="text-sm font-semibold text-gray-600">
+                  {isFinishing ? "Processing..." : "Ready to speak"}
+                </p>
+              </div>
+              
+              <button 
+                onClick={handleStartSpeaking} 
+                disabled={isFinishing}
+                className="btn btn-primary bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+              >
+                <Mic className="w-4 h-4" />
+                Press to Speak
+              </button>
+            </div>
+          )
         ) : status === "SPEAKING" ? (
           <div className="flex items-center gap-2">
             {[1,2,3,4,5].map(i => (

@@ -12,6 +12,15 @@ const http = require("http");
 const path = require("path");
 const fs = require("fs");
 const { execSync } = require("child_process");
+
+// Add global error handlers to prevent crashes from unhandled events in third-party libs (like sarvamai)
+process.on('uncaughtException', (err) => {
+  console.error('UNCAUGHT EXCEPTION:', err);
+});
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('UNHANDLED REJECTION at:', promise, 'reason:', reason);
+});
+
 const { createInterviewWebSocketServer } = require("./websocket");
 const { swaggerUi, specs } = require("./swagger");
 const { userAuthRouter, organisationRouter, driveRouter } = require("./api");

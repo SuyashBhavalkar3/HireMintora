@@ -235,6 +235,9 @@ class SarvamTtsService extends StreamingAdapter {
     await stream.pushChunk({ text: cleanText });
     await stream.endStream();
 
+    const buffers = [];
+    let finalContentType = "audio/mpeg";
+
     while (true) {
       if (signal?.aborted) {
         queue.close();
@@ -243,10 +246,18 @@ class SarvamTtsService extends StreamingAdapter {
 
       const { value, done } = await queue.next();
       if (done) {
-        return;
+        break;
       }
 
-      yield value;
+      if (value && value.audio) {
+        buffers.push(Buffer.from(value.audio, "base64"));
+        finalContentType = value.contentType || finalContentType;
+      }
+    }
+
+    if (buffers.length > 0 && !signal?.aborted) {
+      const fullAudio = Buffer.concat(buffers).toString("base64");
+      yield { audio: fullAudio, contentType: finalContentType };
     }
   }
 }
