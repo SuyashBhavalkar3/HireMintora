@@ -20,6 +20,7 @@ class InterviewSession {
 
     this.activeAudioInput = null;
     this.activeTurn = null;
+    this.activeSttTurnId = null; // Track active STT stream to prevent orphaned callbacks
     this.sttStreamBlocked = false;
   }
 
@@ -128,6 +129,7 @@ class InterviewSession {
     this.activeTurn = null;
     this.sentenceBuffer.reset();
     this.activeAudioInput = null;
+    this.activeSttTurnId = null; // Invalidate any pending STT callbacks
     this.sttStreamBlocked = false;
 
     if (!this.stateMachine.isListening()) {
@@ -139,15 +141,21 @@ class InterviewSession {
 
   _createAudioInputStream() {
     const turnId = randomUUID();
+    this.activeSttTurnId = turnId;
+
     const stream = this.sttService.createStream({
       turnId,
       onPartial: (partialText) => {
+        if (this.activeSttTurnId !== turnId) return; // Ignore if cancelled
         this._emit(WS_EVENTS.TRANSCRIPT_PARTIAL, {
           transcript: partialText,
           turnId,
         });
       },
       onFinal: async (finalText) => {
+        if (this.activeSttTurnId !== turnId) return; // Ignore if cancelled
+        this.activeSttTurnId = null;
+        
         this._emit(WS_EVENTS.TRANSCRIPT_FINAL, {
           transcript: finalText,
           turnId,
@@ -155,6 +163,8 @@ class InterviewSession {
         await this._processTurnFromTranscript(turnId, finalText);
       },
       onError: (error) => {
+        if (this.activeSttTurnId !== turnId) return; // Ignore if cancelled
+        this.activeSttTurnId = null;
         this._emitStateChange(turnId, "stt_error", error.message);
       },
     });
