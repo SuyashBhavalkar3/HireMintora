@@ -148,7 +148,7 @@ export default function LoginPage() {
             Continue with Google
           </button>
 
-          <div className="divider" style={{ margin: "20px 0" }}>
+          <div className="divider" style={{ margin: "12px 0" }}>
             or
           </div>
 

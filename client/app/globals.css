@@ -89,7 +89,7 @@ select {
 .btn-primary:hover {
   background: var(--mint-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(52, 211, 153, 0.35);
+  box-shadow: var(--sh-md);
 }
 .btn-primary:active {
   transform: translateY(0);
@@ -281,10 +281,7 @@ textarea.input {
   font-size: 22px;
   font-weight: 800;
   letter-spacing: -0.5px;
-  background: linear-gradient(135deg, var(--mint-dark), var(--mint));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--mint-dark);
   cursor: pointer;
 }
 
@@ -293,8 +290,7 @@ textarea.input {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(14px);
+  background: var(--white);
   border-bottom: 1px solid var(--border);
   height: 64px;
   display: flex;
@@ -321,7 +317,20 @@ textarea.input {
   padding: 5px 14px;
   background: var(--mint-xs);
   border-radius: var(--r-full);
-  border: 1px solid rgba(110, 231, 183, 0.4);
+  border: 1px solid var(--mint-light);
+}
+.navbar-link {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-2);
+  transition: color var(--t);
+  text-decoration: none;
+}
+.navbar-link:hover {
+  color: var(--mint-dark);
+}
+.navbar-link.active {
+  color: var(--mint-dark);
 }
 
 /* ─── Page Loading ────────────────────────────────────────────────────────── */
@@ -341,8 +350,7 @@ textarea.input {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(249, 250, 251, 0.9);
-  backdrop-filter: blur(14px);
+  background: var(--bg);
   border-bottom: 1px solid var(--border);
 }
 .landing-nav-inner {
@@ -376,7 +384,7 @@ textarea.input {
   padding: 5px 16px;
   border-radius: var(--r-full);
   margin-bottom: 28px;
-  border: 1px solid rgba(110, 231, 183, 0.5);
+  border: 1px solid var(--mint-dark);
   animation: fadeDown 0.5s ease both;
 }
 .hero-h1 {
@@ -507,10 +515,10 @@ textarea.input {
   margin: 0 auto;
   text-align: center;
   padding: 60px 48px;
-  background: linear-gradient(160deg, #f0fdf4 0%, var(--mint-light) 100%);
+  background: var(--mint-xs);
   border-radius: var(--r-xl);
-  border: 1px solid rgba(110, 231, 183, 0.4);
-  box-shadow: 0 0 60px rgba(110, 231, 183, 0.12);
+  border: 1px solid var(--mint-light);
+  box-shadow: var(--sh-sm);
 }
 .cta-h2 {
   font-size: clamp(24px, 3vw, 38px);
@@ -538,9 +546,10 @@ textarea.input {
 
 /* ─── Auth ────────────────────────────────────────────────────────────────── */
 .auth-layout {
-  min-height: 100vh;
+  height: 100vh;
   display: grid;
   grid-template-columns: 1fr 1fr;
+  overflow: hidden;
 }
 @media (max-width: 768px) {
   .auth-layout {
@@ -548,39 +557,19 @@ textarea.input {
   }
 }
 .auth-panel-left {
-  background: linear-gradient(160deg, var(--mint-dark) 0%, #064e3b 100%);
+  background: var(--mint-dark);
   display: flex;
   flex-direction: column;
   justify-content: center;
   padding: 60px 56px;
   position: relative;
-  overflow: hidden;
 }
 @media (max-width: 768px) {
   .auth-panel-left {
     display: none;
   }
 }
-.auth-left-deco {
-  position: absolute;
-  bottom: -80px;
-  right: -80px;
-  width: 320px;
-  height: 320px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.07);
-  pointer-events: none;
-}
-.auth-left-deco-2 {
-  position: absolute;
-  top: -60px;
-  left: -80px;
-  width: 260px;
-  height: 260px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.05);
-  pointer-events: none;
-}
+
 .auth-left-brand {
   font-size: 26px;
   font-weight: 800;
@@ -619,7 +608,8 @@ textarea.input {
   width: 34px;
   height: 34px;
   border-radius: var(--r-sm);
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--mint);
+  color: var(--text);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -630,8 +620,14 @@ textarea.input {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 48px 32px;
+  padding: 32px;
   background: var(--bg);
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.auth-panel-right::-webkit-scrollbar {
+  display: none;
 }
 .auth-form-box {
   width: 100%;
@@ -640,10 +636,7 @@ textarea.input {
 .auth-form-brand {
   font-size: 22px;
   font-weight: 800;
-  background: linear-gradient(135deg, var(--mint-dark), var(--mint));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--mint-dark);
   display: block;
   margin-bottom: 8px;
 }
@@ -657,7 +650,7 @@ textarea.input {
 .auth-form-sub {
   font-size: 14px;
   color: var(--text-2);
-  margin-bottom: 28px;
+  margin-bottom: 20px;
 }
 .auth-form {
   display: flex;
@@ -694,10 +687,7 @@ textarea.input {
 .onboarding-brand {
   font-size: 22px;
   font-weight: 800;
-  background: linear-gradient(135deg, var(--mint-dark), var(--mint));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--mint-dark);
   display: block;
   margin-bottom: 36px;
 }
@@ -741,9 +731,8 @@ textarea.input {
   box-shadow: var(--sh-md);
 }
 .onboarding-opt.selected {
-  border-color: var(--mint);
+  border-color: var(--mint-dark);
   background: var(--mint-xs);
-  box-shadow: 0 0 0 3px rgba(110, 231, 183, 0.25);
 }
 .onboarding-opt-icon {
   font-size: 30px;
@@ -816,17 +805,20 @@ textarea.input {
 }
 .drive-card {
   background: white;
-  border: 1px solid var(--border);
+  border: 1.5px solid var(--border);
   border-radius: var(--r-lg);
   padding: 24px;
   cursor: pointer;
-  transition: all var(--t-slow);
-  display: block;
+  transition: all var(--t);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   text-decoration: none;
+  color: inherit;
 }
 .drive-card:hover {
-  box-shadow: var(--sh-lg);
-  border-color: var(--mint);
+  border-color: var(--mint-dark);
+  box-shadow: var(--sh-md);
   transform: translateY(-2px);
 }
 .drive-card-role {
@@ -851,12 +843,14 @@ textarea.input {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-top: 16px;
+  padding-top: 12px;
   border-top: 1px solid var(--border);
+  margin-top: auto;
 }
 .drive-card-date {
   font-size: 12px;
   color: var(--text-2);
+  font-weight: 500;
 }
 .drive-card-arrow {
   font-size: 16px;

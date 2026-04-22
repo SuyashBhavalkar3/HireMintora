@@ -1,11 +1,27 @@
 const express = require("express");
-const { setupOrganisation } = require("./org.controller");
+const { setupOrganisation, getOrganisation } = require("./org.controller");
 const { authenticateUser } = require("../../middlewares/auth.middleware");
 
 const router = express.Router();
 
 // All organisation routes are protected
 router.use(authenticateUser);
+
+/**
+ * @swagger
+ * /api/organisation:
+ *   get:
+ *     summary: Get organisation details for the current user.
+ *     tags: [Organisation]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Organisation details retrieved successfully.
+ *       404:
+ *         description: Organisation not found or user not linked.
+ */
+router.get("/", getOrganisation);
 
 /**
  * @swagger

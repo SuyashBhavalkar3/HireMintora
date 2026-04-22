@@ -78,6 +78,9 @@ export const apiOrgSetup = (body: {
     { method: "POST", body: JSON.stringify(body) }
   );
 
+export const apiGetOrg = () =>
+  req<{ success: boolean; organisation: any }>("/api/organisation");
+
 // ─── Drive ────────────────────────────────────────────────────────────────────
 
 export const apiCreateDrive = (body: { role: string; description?: string }) =>

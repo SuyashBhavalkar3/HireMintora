@@ -164,6 +164,46 @@ async function setupOrganisation(req, res) {
   }
 }
 
+/**
+ * Retrieves the organization profile for the authenticated user.
+ */
+async function getOrganisation(req, res) {
+  const orgId = req.user.organisationId;
+  if (!orgId) {
+    return res.status(404).json({
+      success: false,
+      errors: ["Your account is not linked to an organisation."]
+    });
+  }
+
+  try {
+    const org = await prisma.organisation.findUnique({
+      where: { id: orgId },
+      include: {
+        _count: {
+          select: { drives: true }
+        }
+      }
+    });
+
+    if (!org) {
+      return res.status(404).json({
+        success: false,
+        errors: ["Organisation profile not found."]
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      organisation: org
+    });
+  } catch (error) {
+    console.error("Get organisation error:", error);
+    return res.status(500).json({ success: false, errors: ["Internal server error."] });
+  }
+}
+
 module.exports = {
-  setupOrganisation
+  setupOrganisation,
+  getOrganisation
 };
