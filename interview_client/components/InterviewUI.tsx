@@ -51,10 +51,7 @@ export default function InterviewUI({ tokenId }: { tokenId: string }) {
       setStatus("LISTENING");
       // Trigger AI to start the conversation
       socket.send(JSON.stringify({
-        type: "text_answer",
-        payload: {
-          text: "Hello, I am ready. Please introduce yourself and start the interview."
-        }
+        type: "start_interview"
       }));
     };
     

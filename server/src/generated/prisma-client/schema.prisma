@@ -21,26 +21,34 @@ datasource db {
 // later added a password). The email is always the
 // canonical unique identifier.
 // ─────────────────────────────────────────────
+/// User represents an HR / Employer account.
+/// Supports both Manual (email/password) and OAuth (Supabase) authentication.
 model User {
+  /// Unique identifier for the user (UUID).
   id       String @id @default(uuid())
+  /// Full name of the HR user.
   fullName String
+  /// Canonical unique identifier (Email).
   email    String @unique
 
-  // Manual auth — nullable so OAuth-only users skip it
+  /// Manual auth: Hashed password (nullable for OAuth-only users).
   passwordHash String?
 
-  // Supabase OAuth — nullable for manual-only users
+  /// OAuth: Unique ID from Supabase (nullable for manual-only users).
   supabaseUserId String? @unique
-  oauthProvider  String? // e.g. "google", "github"
+  /// OAuth provider name (e.g., "google", "github").
+  oauthProvider  String?
 
+  /// Whether the account is active and allowed to log in.
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Organisation Link
+  /// Link to the user's organization.
   organisationId   String?
   organisation     Organisation? @relation(fields: [organisationId], references: [id])
-  organisationRole String? // 'OWNER' | 'MEMBER'
+  /// The user's role within the organization: 'OWNER' or 'MEMBER'.
+  organisationRole String?
 
   @@map("users")
 }
@@ -49,15 +57,21 @@ model User {
 // Organisation (Workspace / Business Entity)
 // An HR User can create or join an organisation.
 // ─────────────────────────────────────────────
+/// Organisation represents a workspace or business entity created or joined by HR users.
 model Organisation {
   id          String  @id @default(uuid())
+  /// Display name of the company or institution.
   name        String
+  /// Optional tagline or description.
   description String?
-  category    String // e.g. "Startup", "Enterprise", "Educational Institute", "Other"
+  /// Business category (e.g., "Startup", "Enterprise").
+  category    String
+  /// Unique referral/join code for this organization.
   orgCode     String  @unique
 
-  // Relations
+  /// All HR members belonging to this organization.
   members User[]
+  /// All hiring drives conducted by this organization.
   drives  HiringDrive[]
 
   createdAt DateTime @default(now())
@@ -70,16 +84,21 @@ model Organisation {
 // Hiring Drive
 // An organisation can create hiring drives for roles.
 // ─────────────────────────────────────────────
+/// HiringDrive represents a specific recruitment campaign for a role (e.g., "SWE Intern 2026").
 model HiringDrive {
   id          String  @id @default(uuid())
+  /// The job role name.
   role        String
+  /// Description of the drive or role requirements.
   description String?
+  /// Whether the drive is currently accepting candidates or active.
   isActive    Boolean @default(true)
 
+  /// The organization that owns this drive.
   organisationId String
   organisation   Organisation @relation(fields: [organisationId], references: [id])
 
-  // Candidates relations
+  /// List of candidates invited to or imported for this drive.
   candidates DriveCandidate[]
 
   createdAt DateTime @default(now())
@@ -92,19 +111,75 @@ model HiringDrive {
 // Drive Candidate
 // Candidates imported for a specific hiring drive.
 // ─────────────────────────────────────────────
+/// DriveCandidate represents a candidate imported into a specific hiring drive.
 model DriveCandidate {
   id       String @id @default(uuid())
+  /// Candidate's email address.
   email    String
+  /// Candidate's full name.
   fullName String
+  /// Unique secure token used for candidate assessment access.
   token    String @unique
-  status   String @default("IMPORTED") // e.g. "IMPORTED", "INVITED", "COMPLETED"
+  /// Current status of the candidate (e.g., "IMPORTED", "INVITED", "COMPLETED").
+  status   String @default("IMPORTED")
 
+  /// The hiring drive this candidate belongs to.
   hiringDriveId String
   hiringDrive   HiringDrive @relation(fields: [hiringDriveId], references: [id])
+
+  /// All interview sessions for this candidate.
+  interviews Interview[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@unique([email, hiringDriveId])
   @@map("drive_candidates")
+}
+
+// ─────────────────────────────────────────────
+// Interview (Session)
+// Tracks a specific interview attempt by a candidate.
+// ─────────────────────────────────────────────
+/// Interview represents a specific interview session for a candidate.
+model Interview {
+  id          String         @id @default(uuid())
+  /// The candidate participating in this interview.
+  candidateId String
+  candidate   DriveCandidate @relation(fields: [candidateId], references: [id])
+
+  /// Current status of the interview session.
+  status String @default("STARTED") // e.g., "STARTED", "COMPLETED", "CANCELLED"
+
+  /// Full conversation history for this session.
+  messages Message[]
+
+  startTime DateTime  @default(now())
+  endTime   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("interviews")
+}
+
+// ─────────────────────────────────────────────
+// Message (Conversation Transcript)
+// Stores individual turns in an interview.
+// ─────────────────────────────────────────────
+/// Message represents a single turn (user speech or AI response) in an interview.
+model Message {
+  id          String    @id @default(uuid())
+  /// The interview session this message belongs to.
+  interviewId String
+  interview   Interview @relation(fields: [interviewId], references: [id])
+
+  /// The role of the sender: "user" or "llm".
+  role      String
+  /// The textual content of the message.
+  content   String
+  /// Timestamp when the message was fully committed.
+  timestamp DateTime @default(now())
+
+  @@map("messages")
 }

@@ -127,9 +127,59 @@ model DriveCandidate {
   hiringDriveId  String
   hiringDrive    HiringDrive @relation(fields: [hiringDriveId], references: [id])
 
+  /// All interview sessions for this candidate.
+  interviews     Interview[]
+
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
   @@unique([email, hiringDriveId])
   @@map("drive_candidates")
+}
+
+// ─────────────────────────────────────────────
+// Interview (Session)
+// Tracks a specific interview attempt by a candidate.
+// ─────────────────────────────────────────────
+/// Interview represents a specific interview session for a candidate.
+model Interview {
+  id              String         @id @default(uuid())
+  /// The candidate participating in this interview.
+  candidateId     String
+  candidate       DriveCandidate @relation(fields: [candidateId], references: [id])
+  
+  /// Current status of the interview session.
+  status          String         @default("STARTED") // e.g., "STARTED", "COMPLETED", "CANCELLED"
+  
+  /// Full conversation history for this session.
+  messages        Message[]
+  
+  startTime       DateTime       @default(now())
+  endTime         DateTime?
+  
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@map("interviews")
+}
+
+// ─────────────────────────────────────────────
+// Message (Conversation Transcript)
+// Stores individual turns in an interview.
+// ─────────────────────────────────────────────
+/// Message represents a single turn (user speech or AI response) in an interview.
+model Message {
+  id          String    @id @default(uuid())
+  /// The interview session this message belongs to.
+  interviewId String
+  interview   Interview @relation(fields: [interviewId], references: [id])
+  
+  /// The role of the sender: "user" or "llm".
+  role        String
+  /// The textual content of the message.
+  content     String
+  /// Timestamp when the message was fully committed.
+  timestamp   DateTime  @default(now())
+
+  @@map("messages")
 }

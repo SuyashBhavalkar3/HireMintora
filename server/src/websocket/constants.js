@@ -9,6 +9,7 @@ const WS_EVENTS = {
   AI_TEXT_CHUNK: "ai_text_chunk",
   TTS_AUDIO_CHUNK: "tts_audio_chunk",
   STATE_CHANGE: "state_change",
+  START_INTERVIEW: "start_interview",
 };
 
 const INTERVIEW_STATES = {

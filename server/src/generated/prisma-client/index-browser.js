@@ -166,6 +166,24 @@ exports.Prisma.DriveCandidateScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.InterviewScalarFieldEnum = {
+  id: 'id',
+  candidateId: 'candidateId',
+  status: 'status',
+  startTime: 'startTime',
+  endTime: 'endTime',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.MessageScalarFieldEnum = {
+  id: 'id',
+  interviewId: 'interviewId',
+  role: 'role',
+  content: 'content',
+  timestamp: 'timestamp'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -186,7 +204,9 @@ exports.Prisma.ModelName = {
   User: 'User',
   Organisation: 'Organisation',
   HiringDrive: 'HiringDrive',
-  DriveCandidate: 'DriveCandidate'
+  DriveCandidate: 'DriveCandidate',
+  Interview: 'Interview',
+  Message: 'Message'
 };
 
 /**

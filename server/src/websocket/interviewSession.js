@@ -17,16 +17,22 @@ class InterviewSession {
     this.sttService = dependencies.sttService;
     this.ttsService = dependencies.ttsService;
     this.llmService = dependencies.llmService;
+    this.prisma = dependencies.prisma;
 
     this.activeAudioInput = null;
     this.activeTurn = null;
     this.activeSttTurnId = null; // Track active STT stream to prevent orphaned callbacks
     this.sttStreamBlocked = false;
+
+    this.interviewId = null;
   }
 
-  attachConnection(ws) {
+  async attachConnection(ws) {
     this.connections.add(ws);
     this._emitStateChange(null, "connected");
+
+    // Ensure we have an interview record as soon as someone connects
+    await this._ensureInterviewRecord();
   }
 
   detachConnection(ws) {
@@ -92,6 +98,18 @@ class InterviewSession {
     await activeInput.stream.endStream();
   }
 
+  async handleStartInterview() {
+    if (!this.stateMachine.isListening()) {
+      return;
+    }
+
+    const turnId = randomUUID();
+    // Start the AI's first turn silently without emitting a user transcript message
+    // or saving a user message to the database.
+    const hiddenPrompt = "Hello, I am ready. Please introduce yourself and start the interview.";
+    await this._processTurnFromTranscript(turnId, hiddenPrompt);
+  }
+
   async handleTextAnswer(payload = {}) {
     if (!this.stateMachine.isListening()) {
       return;
@@ -104,6 +122,10 @@ class InterviewSession {
 
     const turnId = randomUUID();
     this._emit(WS_EVENTS.TRANSCRIPT_FINAL, { transcript: text, turnId });
+    
+    // Commit user message
+    await this._commitMessage("user", text);
+    
     await this._processTurnFromTranscript(turnId, text);
   }
 
@@ -118,6 +140,10 @@ class InterviewSession {
 
     const code = typeof payload.code === "string" ? payload.code : "";
     const turnId = randomUUID();
+
+    // Commit code submission as a user message
+    await this._commitMessage("user", `[Code Submission]\n${code}`);
+
     await this._processCodeTurn(turnId, code);
   }
 
@@ -160,6 +186,10 @@ class InterviewSession {
           transcript: finalText,
           turnId,
         });
+
+        // Commit user message
+        await this._commitMessage("user", finalText);
+
         await this._processTurnFromTranscript(turnId, finalText);
       },
       onError: (error) => {
@@ -182,6 +212,8 @@ class InterviewSession {
     this.stateMachine.transition(INTERVIEW_STATES.PROCESSING);
     this._emitStateChange(turnId, "processing");
 
+    let fullAiResponse = "";
+
     try {
       for await (const token of this.llmService.streamInterviewResponse({
         transcript,
@@ -192,6 +224,7 @@ class InterviewSession {
           return;
         }
 
+        fullAiResponse += token;
         this._emit(WS_EVENTS.AI_TEXT_CHUNK, { text: token, turnId });
         const completeSentences = this.sentenceBuffer.pushToken(token);
         await this._speakSentences(turnId, completeSentences, abortController.signal);
@@ -199,6 +232,11 @@ class InterviewSession {
 
       const remainingSentences = this.sentenceBuffer.flushRemainder();
       await this._speakSentences(turnId, remainingSentences, abortController.signal);
+
+      // Commit full AI response
+      if (fullAiResponse.trim()) {
+        await this._commitMessage("llm", fullAiResponse.trim());
+      }
     } catch (error) {
       this._emitStateChange(turnId, "processing_error", error.message);
     } finally {
@@ -223,6 +261,8 @@ class InterviewSession {
     this.stateMachine.transition(INTERVIEW_STATES.PROCESSING);
     this._emitStateChange(turnId, "processing");
 
+    let fullAiResponse = "";
+
     try {
       for await (const token of this.llmService.streamCodeEvaluation({
         code,
@@ -232,6 +272,7 @@ class InterviewSession {
           return;
         }
 
+        fullAiResponse += token;
         this._emit(WS_EVENTS.AI_TEXT_CHUNK, { text: token, turnId });
         const completeSentences = this.sentenceBuffer.pushToken(token);
         await this._speakSentences(turnId, completeSentences, abortController.signal);
@@ -239,6 +280,11 @@ class InterviewSession {
 
       const remainingSentences = this.sentenceBuffer.flushRemainder();
       await this._speakSentences(turnId, remainingSentences, abortController.signal);
+
+      // Commit full AI evaluation
+      if (fullAiResponse.trim()) {
+        await this._commitMessage("llm", fullAiResponse.trim());
+      }
     } catch (error) {
       this._emitStateChange(turnId, "code_evaluation_error", error.message);
     } finally {
@@ -320,6 +366,67 @@ class InterviewSession {
       if (ws.readyState === WebSocket.OPEN) {
         ws.send(message);
       }
+    }
+  }
+
+  async _ensureInterviewRecord() {
+    if (this.interviewId || !this.tokenId || !this.prisma) {
+      return;
+    }
+
+    try {
+      // Find the candidate by token
+      const candidate = await this.prisma.driveCandidate.findUnique({
+        where: { token: this.tokenId },
+      });
+
+      if (!candidate) {
+        console.error(`[InterviewSession] Candidate not found for token: ${this.tokenId}`);
+        return;
+      }
+
+      // Check if there's an active (STARTED) interview for this candidate
+      // For now, we'll just create a new one each time they connect if none is active,
+      // or we can reuse the last one.
+      const existingInterview = await this.prisma.interview.findFirst({
+        where: {
+          candidateId: candidate.id,
+          status: "STARTED",
+        },
+        orderBy: { createdAt: "desc" },
+      });
+
+      if (existingInterview) {
+        this.interviewId = existingInterview.id;
+      } else {
+        const newInterview = await this.prisma.interview.create({
+          data: {
+            candidateId: candidate.id,
+            status: "STARTED",
+          },
+        });
+        this.interviewId = newInterview.id;
+      }
+    } catch (error) {
+      console.error("[InterviewSession] Failed to ensure interview record:", error);
+    }
+  }
+
+  async _commitMessage(role, content) {
+    if (!this.interviewId || !this.prisma || !content) {
+      return;
+    }
+
+    try {
+      await this.prisma.message.create({
+        data: {
+          interviewId: this.interviewId,
+          role,
+          content,
+        },
+      });
+    } catch (error) {
+      console.error(`[InterviewSession] Failed to commit ${role} message:`, error);
     }
   }
 }

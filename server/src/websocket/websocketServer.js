@@ -3,6 +3,7 @@ const { SessionManager } = require("./sessionManager");
 const { ConfigurableLlmService } = require("./services/llmService");
 const { SarvamSttService } = require("./services/sttService");
 const { SarvamTtsService } = require("./services/ttsService");
+const { prisma } = require("../lib/prismaClient");
 const { INTERVIEW_MODES, WS_EVENTS } = require("./constants");
 
 function parseMode(rawMode) {
@@ -35,6 +36,7 @@ function createInterviewWebSocketServer(httpServer, options = {}) {
     sttService,
     ttsService,
     llmService,
+    prisma,
   });
 
   wss.on("connection", (ws, req) => {
@@ -88,6 +90,9 @@ function createInterviewWebSocketServer(httpServer, options = {}) {
           break;
         case WS_EVENTS.CODE_SUBMISSION:
           await activeSession.handleCodeSubmission(payload);
+          break;
+        case WS_EVENTS.START_INTERVIEW:
+          await activeSession.handleStartInterview();
           break;
         case WS_EVENTS.CANCEL_TURN:
           activeSession.cancelCurrentTurn("client_cancelled");
