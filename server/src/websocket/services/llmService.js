@@ -1,20 +1,32 @@
-function buildInterviewPrompt(transcript, systemPrompt = "") {
-  return [
-    systemPrompt || "You are a senior technical interviewer. Respond conversationally in 2-4 concise sentences. Ask one useful follow-up question at the end.",
-    "",
-    `Candidate response: ${transcript}`,
-  ].join("\n");
-}
+function buildMessageHistory(transcript, systemPrompt, history, isCode) {
+  const defaultPrompt = isCode
+    ? "You are a senior coding interviewer. Give a brief evaluation in 3-5 sentences covering correctness, complexity, and improvements. End with one follow-up coding question."
+    : "You are a senior technical interviewer. Respond conversationally in 2-4 concise sentences. Ask one useful follow-up question at the end.";
 
-function buildCodePrompt(code) {
-  return [
-    "You are a senior coding interviewer.",
-    "Give a brief evaluation in 3-5 sentences covering correctness, complexity, and improvements.",
-    "End with one follow-up coding question.",
-    "",
-    "Candidate code:",
-    code || "(empty submission)",
-  ].join("\n");
+  const messages = [
+    { role: "system", content: systemPrompt || defaultPrompt }
+  ];
+
+  for (const msg of history || []) {
+    messages.push({
+      role: msg.role === "llm" ? "assistant" : "user",
+      content: msg.content
+    });
+  }
+
+  const userTranscriptStr = isCode ? `[Code Submission]\n${transcript || ""}` : (transcript || "");
+  
+  const lastMsg = messages[messages.length - 1];
+  if (!lastMsg || lastMsg.role !== "user" || lastMsg.content !== userTranscriptStr) {
+    if (userTranscriptStr) {
+      messages.push({
+        role: "user",
+        content: userTranscriptStr
+      });
+    }
+  }
+
+  return messages;
 }
 
 function readEnv(name, fallback = "") {
@@ -88,24 +100,24 @@ class ConfigurableLlmService {
     this.geminiModel = options.geminiModel || readEnv("GEMINI_MODEL", "gemini-1.5-flash");
   }
 
-  async *streamInterviewResponse({ transcript, systemPrompt, signal }) {
-    const prompt = buildInterviewPrompt(transcript, systemPrompt);
-    yield* this._streamByProvider(prompt, signal);
+  async *streamInterviewResponse({ transcript, systemPrompt, signal, history = [] }) {
+    const messagesArray = buildMessageHistory(transcript, systemPrompt, history, false);
+    yield* this._streamByProvider(messagesArray, signal);
   }
 
-  async *streamCodeEvaluation({ code, signal }) {
-    const prompt = buildCodePrompt(code);
-    yield* this._streamByProvider(prompt, signal);
+  async *streamCodeEvaluation({ code, signal, history = [] }) {
+    const messagesArray = buildMessageHistory(code, "", history, true);
+    yield* this._streamByProvider(messagesArray, signal);
   }
 
-  async *_streamByProvider(prompt, signal) {
+  async *_streamByProvider(messagesArray, signal) {
     switch (this.provider) {
       case "groq":
         yield* this._streamOpenAiCompatible({
           url: "https://api.groq.com/openai/v1/chat/completions",
           apiKey: this.groqApiKey,
           model: this.groqModel,
-          prompt,
+          messagesArray,
           signal,
         });
         return;
@@ -114,7 +126,7 @@ class ConfigurableLlmService {
           url: "https://api.openai.com/v1/chat/completions",
           apiKey: this.openaiApiKey,
           model: this.openaiModel,
-          prompt,
+          messagesArray,
           signal,
         });
         return;
@@ -122,7 +134,7 @@ class ConfigurableLlmService {
         yield* this._streamGemini({
           apiKey: this.geminiApiKey,
           model: this.geminiModel,
-          prompt,
+          messagesArray,
           signal,
         });
         return;
@@ -131,7 +143,7 @@ class ConfigurableLlmService {
     }
   }
 
-  async *_streamOpenAiCompatible({ url, apiKey, model, prompt, signal }) {
+  async *_streamOpenAiCompatible({ url, apiKey, model, messagesArray, signal }) {
     if (!apiKey) {
       throw new Error("Missing API key for selected LLM provider");
     }
@@ -146,16 +158,7 @@ class ConfigurableLlmService {
         model,
         stream: true,
         temperature: this.temperature,
-        messages: [
-          {
-            role: "system",
-            content: "You are a helpful, concise AI interviewer.",
-          },
-          {
-            role: "user",
-            content: prompt,
-          },
-        ],
+        messages: messagesArray,
       }),
       signal,
     });
@@ -173,7 +176,7 @@ class ConfigurableLlmService {
     }
   }
 
-  async *_streamGemini({ apiKey, model, prompt, signal }) {
+  async *_streamGemini({ apiKey, model, messagesArray, signal }) {
     if (!apiKey) {
       throw new Error("Missing GEMINI_API_KEY");
     }
@@ -182,22 +185,39 @@ class ConfigurableLlmService {
       `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}` +
       `:streamGenerateContent?alt=sse&key=${encodeURIComponent(apiKey)}`;
 
+    const contents = [];
+    let systemInstruction = null;
+
+    for (const msg of messagesArray) {
+      if (msg.role === "system") {
+        systemInstruction = {
+          parts: [{ text: msg.content }],
+        };
+      } else {
+        contents.push({
+          role: msg.role === "assistant" ? "model" : "user",
+          parts: [{ text: msg.content }],
+        });
+      }
+    }
+
+    const requestBody = {
+      contents,
+      generationConfig: {
+        temperature: this.temperature,
+      },
+    };
+
+    if (systemInstruction) {
+      requestBody.systemInstruction = systemInstruction;
+    }
+
     const response = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        contents: [
-          {
-            role: "user",
-            parts: [{ text: prompt }],
-          },
-        ],
-        generationConfig: {
-          temperature: this.temperature,
-        },
-      }),
+      body: JSON.stringify(requestBody),
       signal,
     });
 

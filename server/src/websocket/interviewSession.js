@@ -215,10 +215,13 @@ class InterviewSession {
     let fullAiResponse = "";
 
     try {
+      const history = await this._getInterviewHistory();
+
       for await (const token of this.llmService.streamInterviewResponse({
         transcript,
         systemPrompt: this.systemPrompt,
         signal: abortController.signal,
+        history,
       })) {
         if (abortController.signal.aborted) {
           return;
@@ -264,9 +267,12 @@ class InterviewSession {
     let fullAiResponse = "";
 
     try {
+      const history = await this._getInterviewHistory();
+
       for await (const token of this.llmService.streamCodeEvaluation({
         code,
         signal: abortController.signal,
+        history,
       })) {
         if (abortController.signal.aborted) {
           return;
@@ -427,6 +433,25 @@ class InterviewSession {
       });
     } catch (error) {
       console.error(`[InterviewSession] Failed to commit ${role} message:`, error);
+    }
+  }
+
+  async _getInterviewHistory() {
+    if (!this.interviewId || !this.prisma) {
+      return [];
+    }
+    try {
+      const messages = await this.prisma.message.findMany({
+        where: { interviewId: this.interviewId },
+        orderBy: { timestamp: "asc" },
+      });
+      return messages.map((m) => ({
+        role: m.role,
+        content: m.content,
+      }));
+    } catch (error) {
+      console.error("[InterviewSession] Failed to fetch history:", error);
+      return [];
     }
   }
 }
