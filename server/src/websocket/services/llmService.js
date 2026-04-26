@@ -1,3 +1,13 @@
+/**
+ * Builds an array of message objects compatible with standard LLM APIs (OpenAI format).
+ * Integrates conversation history and ensures the most recent transcript is included.
+ *
+ * @param {string} transcript - The latest user input or code submission.
+ * @param {string} systemPrompt - Optional custom system instructions.
+ * @param {Array<{role: string, content: string}>} history - Previous messages from the database.
+ * @param {boolean} isCode - Flag indicating if this is a coding evaluation turn.
+ * @returns {Array<{role: string, content: string}>} The assembled message history array.
+ */
 function buildMessageHistory(transcript, systemPrompt, history, isCode) {
   const defaultPrompt = isCode
     ? "You are a senior coding interviewer. Give a brief evaluation in 3-5 sentences covering correctness, complexity, and improvements. End with one follow-up coding question."
@@ -37,6 +47,14 @@ function readEnv(name, fallback = "") {
   return value.trim() || fallback;
 }
 
+/**
+ * Parses a Server-Sent Events (SSE) stream commonly used by LLM providers.
+ * Yields parsed JSON objects as they arrive.
+ *
+ * @param {ReadableStream} stream - The SSE fetch response body stream.
+ * @param {AbortSignal} signal - Optional abort signal to cancel reading.
+ * @yields {Object} Parsed JSON data object from the stream.
+ */
 async function* parseSseStream(stream, signal) {
   const reader = stream.getReader();
   const decoder = new TextDecoder();
@@ -85,6 +103,11 @@ async function* parseSseStream(stream, signal) {
   }
 }
 
+/**
+ * A service class for interacting with various Large Language Model (LLM) providers.
+ * Supports streaming responses for standard technical interviews and code evaluations.
+ * Automatically handles provider selection and API key management based on environment variables.
+ */
 class ConfigurableLlmService {
   constructor(options = {}) {
     this.provider = (options.provider || readEnv("LLM_PROVIDER", "groq")).toLowerCase();
@@ -100,16 +123,43 @@ class ConfigurableLlmService {
     this.geminiModel = options.geminiModel || readEnv("GEMINI_MODEL", "gemini-1.5-flash");
   }
 
+  /**
+   * Streams an AI response for a standard conversational interview turn.
+   *
+   * @param {Object} options - Configuration for the generation.
+   * @param {string} options.transcript - The candidate's latest verbal response (transcribed).
+   * @param {string} options.systemPrompt - System instruction modifying the AI's behavior.
+   * @param {AbortSignal} options.signal - Signal to abort the stream.
+   * @param {Array} options.history - The conversation history prior to this turn.
+   * @yields {string} Chunks of the AI's text response.
+   */
   async *streamInterviewResponse({ transcript, systemPrompt, signal, history = [] }) {
     const messagesArray = buildMessageHistory(transcript, systemPrompt, history, false);
     yield* this._streamByProvider(messagesArray, signal);
   }
 
+  /**
+   * Streams an AI evaluation and follow-up for a candidate's code submission.
+   *
+   * @param {Object} options - Configuration for the generation.
+   * @param {string} options.code - The code submitted by the candidate.
+   * @param {AbortSignal} options.signal - Signal to abort the stream.
+   * @param {Array} options.history - The conversation history prior to this turn.
+   * @yields {string} Chunks of the AI's text response.
+   */
   async *streamCodeEvaluation({ code, signal, history = [] }) {
     const messagesArray = buildMessageHistory(code, "", history, true);
     yield* this._streamByProvider(messagesArray, signal);
   }
 
+  /**
+   * Internal router to dispatch the stream request to the configured provider.
+   *
+   * @param {Array<{role: string, content: string}>} messagesArray - The full message context array.
+   * @param {AbortSignal} signal - Signal to abort the stream.
+   * @yields {string} Chunks of text from the selected LLM provider.
+   * @private
+   */
   async *_streamByProvider(messagesArray, signal) {
     switch (this.provider) {
       case "groq":

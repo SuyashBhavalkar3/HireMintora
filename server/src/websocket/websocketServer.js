@@ -6,10 +6,23 @@ const { SarvamTtsService } = require("./services/ttsService");
 const { prisma } = require("../lib/prismaClient");
 const { INTERVIEW_MODES, WS_EVENTS } = require("./constants");
 
+/**
+ * Validates and parses the requested interview mode.
+ * Defaults to DEFAULT mode if an invalid mode is provided.
+ *
+ * @param {string} rawMode - The raw mode string from the client.
+ * @returns {string} The validated interview mode.
+ */
 function parseMode(rawMode) {
   return rawMode === INTERVIEW_MODES.CODING ? INTERVIEW_MODES.CODING : INTERVIEW_MODES.DEFAULT;
 }
 
+/**
+ * Safely parses incoming JSON messages from the WebSocket.
+ *
+ * @param {Buffer|string} raw - The raw message buffer or string.
+ * @returns {Object|null} The parsed JSON object, or null if invalid.
+ */
 function parseIncomingMessage(raw) {
   try {
     const parsed = JSON.parse(raw.toString());
@@ -22,6 +35,14 @@ function parseIncomingMessage(raw) {
   }
 }
 
+/**
+ * Creates and configures the WebSocket server for AI interviews.
+ * Sets up routing, attaches the service dependencies, and manages client connections.
+ *
+ * @param {http.Server} httpServer - The underlying HTTP server to attach to.
+ * @param {Object} options - Optional configuration overrides and dependencies.
+ * @returns {Object} An object containing the WebSocket server and the SessionManager.
+ */
 function createInterviewWebSocketServer(httpServer, options = {}) {
   const wss = new WebSocketServer({
     server: httpServer,

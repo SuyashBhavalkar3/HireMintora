@@ -4,7 +4,18 @@ const { SentenceBuffer } = require("./sentenceBuffer");
 const { InterviewStateMachine } = require("./stateMachine");
 const { INTERVIEW_MODES, INTERVIEW_STATES, WS_EVENTS } = require("./constants");
 
+/**
+ * Manages the state, WebSocket connections, and data flow for a single AI interview session.
+ * Coordinates STT (Speech-to-Text), LLM (Language Model), and TTS (Text-to-Speech) pipelines.
+ */
 class InterviewSession {
+  /**
+   * Initializes a new Interview Session.
+   *
+   * @param {string} sessionId - Unique identifier for the active WebSocket session.
+   * @param {Object} dependencies - Core services required (sttService, ttsService, llmService, prisma).
+   * @param {Object} options - Interview specific configurations (tokenId, mode, systemPrompt).
+   */
   constructor(sessionId, dependencies = {}, options = {}) {
     this.sessionId = sessionId;
     this.tokenId = options.tokenId || null;
@@ -27,6 +38,12 @@ class InterviewSession {
     this.interviewId = null;
   }
 
+  /**
+   * Attaches a new WebSocket connection to this session.
+   * Also ensures an interview database record is created if none exists.
+   *
+   * @param {WebSocket} ws - The WebSocket client connection.
+   */
   async attachConnection(ws) {
     this.connections.add(ws);
     this._emitStateChange(null, "connected");
@@ -57,6 +74,12 @@ class InterviewSession {
     }
   }
 
+  /**
+   * Handles incoming audio chunks from the client.
+   * Forwards them to the active STT (Speech-to-Text) stream.
+   *
+   * @param {Object} payload - The payload containing the audio chunk.
+   */
   async handleAudioChunk(payload = {}) {
     if (this.mode === INTERVIEW_MODES.CODING) {
       return;
@@ -98,6 +121,10 @@ class InterviewSession {
     await activeInput.stream.endStream();
   }
 
+  /**
+   * Explicit trigger to start the AI interview.
+   * Generates a hidden prompt to force the AI to introduce itself.
+   */
   async handleStartInterview() {
     if (!this.stateMachine.isListening()) {
       return;
@@ -110,6 +137,12 @@ class InterviewSession {
     await this._processTurnFromTranscript(turnId, hiddenPrompt);
   }
 
+  /**
+   * Handles manual text answers submitted by the candidate (fallback or text mode).
+   * Commits the message to DB and triggers AI processing.
+   *
+   * @param {Object} payload - The payload containing the text answer.
+   */
   async handleTextAnswer(payload = {}) {
     if (!this.stateMachine.isListening()) {
       return;
@@ -129,6 +162,12 @@ class InterviewSession {
     await this._processTurnFromTranscript(turnId, text);
   }
 
+  /**
+   * Handles code submitted by the candidate during coding rounds.
+   * Commits the code to DB and triggers specialized code evaluation.
+   *
+   * @param {Object} payload - The payload containing the submitted code.
+   */
   async handleCodeSubmission(payload = {}) {
     if (this.mode !== INTERVIEW_MODES.CODING) {
       return;
@@ -202,6 +241,17 @@ class InterviewSession {
     return { turnId, stream };
   }
 
+  /**
+   * Core orchestrator for conversational turns.
+   * 1. Fetches interview history.
+   * 2. Streams the transcript and history to the LLM.
+   * 3. Buffers the LLM text output into complete sentences.
+   * 4. Streams complete sentences to the TTS pipeline for speech generation.
+   *
+   * @param {string} turnId - Unique ID for this conversation turn.
+   * @param {string} transcript - The user's input text to be processed.
+   * @private
+   */
   async _processTurnFromTranscript(turnId, transcript) {
     const abortController = new AbortController();
     this.activeTurn = {
@@ -254,6 +304,14 @@ class InterviewSession {
     }
   }
 
+  /**
+   * Core orchestrator for coding evaluation turns.
+   * Similar to _processTurnFromTranscript but utilizes the specialized code evaluation LLM pipeline.
+   *
+   * @param {string} turnId - Unique ID for this evaluation turn.
+   * @param {string} code - The code snippet submitted by the candidate.
+   * @private
+   */
   async _processCodeTurn(turnId, code) {
     const abortController = new AbortController();
     this.activeTurn = {
@@ -418,6 +476,13 @@ class InterviewSession {
     }
   }
 
+  /**
+   * Commits a single conversation message (user or LLM) to the database.
+   *
+   * @param {string} role - The role of the sender ("user" or "llm").
+   * @param {string} content - The actual text content.
+   * @private
+   */
   async _commitMessage(role, content) {
     if (!this.interviewId || !this.prisma || !content) {
       return;
@@ -436,6 +501,13 @@ class InterviewSession {
     }
   }
 
+  /**
+   * Retrieves the full chronological conversation history for the current interview.
+   * Used to provide context to the LLM during generation.
+   *
+   * @returns {Promise<Array<{role: string, content: string}>>} Array of past messages.
+   * @private
+   */
   async _getInterviewHistory() {
     if (!this.interviewId || !this.prisma) {
       return [];
