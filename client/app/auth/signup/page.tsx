@@ -1,3 +1,16 @@
+/**
+ * @file signup/page.tsx
+ * @description Account creation page with manual signup and Google OAuth.
+ *
+ * Manual signup flow:
+ *   1. User fills in name, email, password, confirm password.
+ *   2. Client-side password match validation.
+ *   3. POST /api/auth/user/signup → JWT issued.
+ *   4. Routes to /onboarding (new users always need to set up an org).
+ *
+ * Google OAuth: Same flow as login — redirects to Supabase → /auth/callback.
+ */
+
 "use client";
 
 import { useState, useEffect } from "react";

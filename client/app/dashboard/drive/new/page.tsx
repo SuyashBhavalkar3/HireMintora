@@ -1,3 +1,14 @@
+/**
+ * @file drive/new/page.tsx
+ * @description Form page for creating a new hiring drive.
+ *
+ * The user specifies a role name (required) and an optional description.
+ * On submit:
+ *   1. POST /api/drive → creates the drive in the database.
+ *   2. storeDrive() → caches the new drive in localStorage for the listing page.
+ *   3. Redirects to /dashboard/drive/[id] for candidate management.
+ */
+
 "use client";
 
 import { useState, useEffect } from "react";

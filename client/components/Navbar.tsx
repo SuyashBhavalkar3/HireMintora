@@ -1,3 +1,15 @@
+/**
+ * @file Navbar.tsx
+ * @description Shared navigation bar used across all authenticated dashboard pages.
+ *
+ * Renders two modes:
+ * - **Authenticated**: Shows Dashboard/Drives links (with active-state highlighting),
+ *   the user's first name, and a Sign Out button.
+ * - **Unauthenticated**: Shows Log In / Sign Up links (fallback for edge cases).
+ *
+ * The brand logo links to /dashboard when logged in, or / when not.
+ */
+
 "use client";
 
 import Link from "next/link";

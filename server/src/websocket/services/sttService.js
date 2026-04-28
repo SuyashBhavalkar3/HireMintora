@@ -1,6 +1,30 @@
+/**
+ * @file sttService.js
+ * @description Sarvam AI Speech-to-Text (STT) streaming service.
+ *
+ * This service connects to Sarvam's real-time STT WebSocket API to transcribe
+ * live candidate audio into text. It extends StreamingAdapter to handle the
+ * connection lifecycle, chunk buffering, and error recovery.
+ *
+ * Audio Flow:
+ *   Browser mic → PCM16 base64 chunks → this service → Sarvam STT WebSocket
+ *   → partial transcriptions (live) → final transcription (on audio_end)
+ *
+ * Configuration: All settings are read from env vars (SARVAM_STT_*).
+ * See `.env.example` for the full list.
+ */
+
 const { SarvamAIClient } = require("sarvamai");
 const { StreamingAdapter, readEnv } = require("./streamingAdapter");
 
+/**
+ * Constructs a minimal WAV file header for raw PCM16 mono audio.
+ * Used when the upstream provider expects audio/wav encoding.
+ *
+ * @param {Buffer} pcmBuffer - Raw PCM16 audio data.
+ * @param {number} sampleRate - Sample rate in Hz (e.g., 16000).
+ * @returns {Buffer} A valid WAV file (44-byte header + PCM data).
+ */
 function buildWavFromPcm16Mono(pcmBuffer, sampleRate) {
   const numChannels = 1;
   const bitsPerSample = 16;
@@ -26,11 +50,20 @@ function buildWavFromPcm16Mono(pcmBuffer, sampleRate) {
   return Buffer.concat([header, pcmBuffer]);
 }
 
+/**
+ * Normalizes the audio payload for Sarvam's STT API.
+ *
+ * WORKAROUND: Sarvam's backend has a strict Pydantic validation that requires
+ * `encoding: 'audio/wav'` in the JSON payload, even when the WebSocket
+ * connection was established with `input_audio_codec: 'pcm_s16le'`.
+ * We send the raw PCM data but label it as 'audio/wav' to bypass this.
+ *
+ * @param {string} audioBase64 - Base64-encoded audio data.
+ * @param {string} encoding - Original encoding label (ignored in practice).
+ * @param {number} sampleRate - Audio sample rate.
+ * @returns {{ audio: string, encoding: string, sampleRate: number }}
+ */
 function normalizeAudioPayload(audioBase64, encoding, sampleRate) {
-  // Sarvam's backend has a strict Pydantic validation on the JSON payload
-  // that requires `encoding: 'audio/wav'` exactly, even when the socket
-  // was connected with `input_audio_codec: 'pcm_s16le'`.
-  // We pass the raw PCM data but fake the encoding string to bypass this.
   return {
     audio: audioBase64,
     encoding: "audio/wav",
@@ -38,6 +71,13 @@ function normalizeAudioPayload(audioBase64, encoding, sampleRate) {
   };
 }
 
+/**
+ * Extracts a human-readable error message from Sarvam provider responses.
+ * Handles various response shapes (nested data objects, direct fields, etc.).
+ *
+ * @param {Object} message - The raw provider message object.
+ * @returns {string} Extracted error string, or empty string if none found.
+ */
 function extractProviderError(message) {
   if (!message || typeof message !== "object") {
     return "";
@@ -61,7 +101,26 @@ function extractProviderError(message) {
   }
 }
 
+/**
+ * Sarvam STT streaming service.
+ * Creates a real-time WebSocket connection to Sarvam's STT API,
+ * accumulates partial transcriptions, and delivers the final transcript.
+ *
+ * Usage:
+ *   const stt = new SarvamSttService();
+ *   const stream = stt.createStream({ onPartial, onFinal, onError });
+ *   await stream.pushAudioChunk(base64AudioPayload);
+ *   await stream.endStream(); // triggers final transcript delivery
+ *
+ * @extends StreamingAdapter
+ */
 class SarvamSttService extends StreamingAdapter {
+  /**
+   * @param {Object} [options] - Override defaults from env vars.
+   * @param {string} [options.apiKey] - Sarvam API key (default: SARVAM_API_KEY env var).
+   * @param {string} [options.languageCode] - BCP-47 language code (default: 'en-IN').
+   * @param {string} [options.model] - STT model name (default: 'saaras:v3').
+   */
   constructor(options = {}) {
     super({
       serviceName: "stt",

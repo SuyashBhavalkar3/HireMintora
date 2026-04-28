@@ -1,3 +1,18 @@
+/**
+ * @file onboarding/page.tsx
+ * @description Organisation setup page for newly registered users.
+ *
+ * Presented after signup if the user has no `organisationId` yet.
+ * Offers two options:
+ *   1. CREATE — Fill in org name, industry, description → creates a new org (user becomes OWNER).
+ *   2. JOIN — Enter an existing org's invite code → joins as MEMBER.
+ *
+ * After successful setup, updates the AuthContext user and redirects to /dashboard.
+ *
+ * Auth Guard: Redirects to /auth/login if unauthenticated,
+ * or /dashboard if user already has an organisation.
+ */
+
 "use client";
 
 import { useState, useEffect } from "react";

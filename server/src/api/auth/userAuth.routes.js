@@ -1,3 +1,10 @@
+/**
+ * @file userAuth.routes.js
+ * @description Express router for user authentication endpoints.
+ * Mounts at /api/auth/user (see api/index.js).
+ * Route-level Swagger/OpenAPI annotations are included inline below.
+ */
+
 const express = require("express");
 const router = express.Router();
 const controller = require("./userAuth.controller");

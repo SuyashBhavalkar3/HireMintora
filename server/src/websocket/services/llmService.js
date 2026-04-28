@@ -1,4 +1,25 @@
 /**
+ * @file llmService.js
+ * @description Multi-provider LLM service for generating AI interview responses.
+ *
+ * Supports three LLM backends (configurable via the `LLM_PROVIDER` env var):
+ *   - **Groq** (default) — Fast inference via Llama models.
+ *   - **OpenAI** — GPT-4o-mini or any OpenAI-compatible model.
+ *   - **Gemini** — Google's Generative AI API.
+ *
+ * All providers stream their responses via Server-Sent Events (SSE), which
+ * this service parses and yields as individual text tokens. The tokens flow
+ * into the SentenceBuffer for TTS batching.
+ *
+ * Two generation modes:
+ *   1. `streamInterviewResponse` — Conversational Q&A with the candidate.
+ *   2. `streamCodeEvaluation`    — Code review and follow-up question.
+ *
+ * @see SentenceBuffer — Consumes the token stream from this service.
+ * @see InterviewSession._processTurnFromTranscript — Orchestrates this service.
+ */
+
+/**
  * Builds an array of message objects compatible with standard LLM APIs (OpenAI format).
  * Integrates conversation history and ensures the most recent transcript is included.
  *

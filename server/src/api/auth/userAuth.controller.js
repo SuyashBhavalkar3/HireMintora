@@ -1,3 +1,16 @@
+/**
+ * @file userAuth.controller.js
+ * @description Controller for user authentication — signup, login, and OAuth.
+ *
+ * Endpoints handled:
+ *   - POST /api/auth/user/signup  — Manual registration (email + password).
+ *   - POST /api/auth/user/login   — Manual login (credential verification).
+ *   - POST /api/auth/user/oauth   — Supabase OAuth (creates/links user by supabaseUserId).
+ *
+ * All endpoints return a JWT on success. OAuth auto-links accounts if the email
+ * matches an existing manual user (enables seamless dual-auth).
+ */
+
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { prisma } = require("../../lib/prismaClient");

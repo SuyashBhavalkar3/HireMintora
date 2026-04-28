@@ -1,3 +1,19 @@
+/**
+ * @file drive/[id]/page.tsx
+ * @description Drive detail page — manage candidates for a specific hiring drive.
+ *
+ * Features:
+ *   - Displays drive metadata (role, description, created date) from localStorage cache.
+ *   - Fetches and displays the full candidate list via apiGetCandidates().
+ *   - Import Candidates: Opens a modal to bulk-import candidates (CSV-like format).
+ *   - Send Invitations: Triggers apiSendLinks() to dispatch interview links to pending candidates.
+ *   - Stats bar showing total / invited / pending candidate counts.
+ *
+ * Data Flow:
+ *   - Drive metadata: Read from localStorage cache (instant, no API call).
+ *   - Candidate list: Fetched from server on mount and after each import/send operation.
+ */
+
 "use client";
 
 import { useEffect, useState, useCallback } from "react";

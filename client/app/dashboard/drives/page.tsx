@@ -1,3 +1,18 @@
+/**
+ * @file drives/page.tsx
+ * @description Hiring drives listing page.
+ *
+ * Reads drives from the localStorage cache (via `getStoredDrives()`) for
+ * instant rendering. Shows a grid of drive cards, each linking to the
+ * drive detail page (/dashboard/drive/[id]).
+ *
+ * If no drives exist, shows an empty state with a CTA to create the first one.
+ *
+ * NOTE: Drive data is cached client-side for speed. The cache is populated
+ * when a drive is created (see drive/new/page.tsx → storeDrive()).
+ * For full server-synced drive lists, an apiGetDrives() endpoint would be needed.
+ */
+
 "use client";
 
 import { useEffect, useState } from "react";

@@ -1,3 +1,17 @@
+/**
+ * @file dashboard/page.tsx
+ * @description Dashboard overview page — the authenticated user's home screen.
+ *
+ * Displays:
+ *   - Organisation details card (name, invite code, category, description).
+ *   - Quick stats card (active drives count, total candidates placeholder).
+ *
+ * Auth Guard: Redirects to /auth/login if unauthenticated,
+ * or /onboarding if the user has no organisation yet.
+ *
+ * The org data is fetched via apiGetOrg() on mount.
+ */
+
 "use client";
 
 import { useEffect, useState } from "react";

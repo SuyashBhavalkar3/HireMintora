@@ -1,3 +1,29 @@
+/**
+ * @file streamingAdapter.js
+ * @description Base abstraction for all streaming AI services (STT, TTS).
+ *
+ * Provides a reusable lifecycle for managing external WebSocket/streaming connections:
+ *   1. open()      — Establish the connection to the external provider.
+ *   2. pushChunk() — Send data chunks (audio or text) to the provider.
+ *   3. endStream() — Signal that no more data will be sent; wait for finalization.
+ *   4. close()     — Tear down the connection and release resources.
+ *
+ * Features:
+ * - Automatic connection timeout handling (prevents hanging on provider failures).
+ * - Chunk queuing during connection setup (no data loss if pushChunk is called before open completes).
+ * - Performance metrics tracking (chunks sent/received, latency measurements).
+ * - Structured debug logging (enable via SARVAM_STREAMING_DEBUG=true env var).
+ *
+ * Both SarvamSttService and SarvamTtsService extend this class and implement
+ * their own `open`, `pushChunk`, `endStream`, and `close` factory methods.
+ */
+
+/**
+ * Reads an environment variable with a fallback default.
+ * @param {string} name - The env var name.
+ * @param {string} [fallback=""] - Default value if the env var is missing or empty.
+ * @returns {string}
+ */
 function readEnv(name, fallback = "") {
   const value = process.env[name];
   if (typeof value !== "string") {
@@ -6,6 +32,12 @@ function readEnv(name, fallback = "") {
   return value.trim() || fallback;
 }
 
+/**
+ * Normalizes any error-like value into a proper Error instance.
+ * Handles strings, Error objects, and arbitrary objects (JSON-serialized).
+ * @param {*} errorLike
+ * @returns {Error}
+ */
 function toError(errorLike) {
   if (errorLike instanceof Error) {
     return errorLike;
@@ -24,7 +56,18 @@ function nowMs() {
   return Date.now();
 }
 
+/**
+ * Base class for streaming AI service adapters.
+ * Subclasses (SarvamSttService, SarvamTtsService) provide concrete
+ * `open`, `pushChunk`, `endStream`, and `close` factory implementations.
+ */
 class StreamingAdapter {
+  /**
+   * @param {Object} options
+   * @param {string} [options.serviceName='stream'] - Label for debug logs.
+   * @param {boolean} [options.debugEnabled] - Override to enable/disable debug logging.
+   * @param {number} [options.connectTimeoutMs=7000] - Max ms to wait for provider connection.
+   */
   constructor(options = {}) {
     this.serviceName = options.serviceName || "stream";
     this.debugEnabled =
@@ -35,6 +78,21 @@ class StreamingAdapter {
     );
   }
 
+  /**
+   * Creates a managed streaming session with automatic lifecycle handling.
+   *
+   * @param {Object} handlers - Callback handlers from the consumer.
+   * @param {string} [handlers.turnId] - Correlation ID for this stream.
+   * @param {Function} [handlers.onPartial] - Called with partial results (e.g., interim STT text).
+   * @param {Function} [handlers.onFinal] - Called with the final result.
+   * @param {Function} [handlers.onError] - Called on any error.
+   * @param {Object} factory - Provider-specific lifecycle implementations.
+   * @param {Function} factory.open - Establishes provider connection; must return the connection object.
+   * @param {Function} factory.pushChunk - Sends a data chunk to the provider.
+   * @param {Function} [factory.endStream] - Signals end-of-input to the provider.
+   * @param {Function} [factory.close] - Tears down the provider connection.
+   * @returns {{ pushChunk: Function, endStream: Function }} Stream control interface.
+   */
   createStream(handlers = {}, factory = {}) {
     const turnId = handlers.turnId || null;
     const startedAt = nowMs();
@@ -214,6 +272,12 @@ class StreamingAdapter {
     };
   }
 
+  /**
+   * Creates a snapshot of the current streaming metrics for debug output.
+   * @param {Object} metrics - The metrics object to snapshot.
+   * @returns {Object}
+   * @private
+   */
   _metricsSnapshot(metrics) {
     return {
       chunksSent: metrics.chunksSent,
@@ -223,6 +287,13 @@ class StreamingAdapter {
     };
   }
 
+  /**
+   * Logs a structured debug event if debug mode is enabled.
+   * Enable via env var: SARVAM_STREAMING_DEBUG=true
+   * @param {string} event - Event label (e.g., 'open', 'end', 'error').
+   * @param {Object} data - Additional data to include in the log.
+   * @private
+   */
   _debug(event, data = {}) {
     if (!this.debugEnabled) {
       return;

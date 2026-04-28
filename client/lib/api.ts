@@ -1,7 +1,27 @@
+/**
+ * @file api.ts
+ * @description Typed HTTP client for the HireMintora backend REST API.
+ *
+ * All API functions use the shared `req<T>()` helper, which:
+ *   1. Reads the JWT from localStorage and attaches it as a Bearer token.
+ *   2. Sends JSON requests to the backend base URL (NEXT_PUBLIC_API_URL).
+ *   3. Parses the response and throws an ApiError with structured messages on failure.
+ *
+ * Usage:
+ *   import { apiLogin, ApiError } from '@/lib/api';
+ *   try {
+ *     const { token, user } = await apiLogin({ email, password });
+ *   } catch (err) {
+ *     if (err instanceof ApiError) console.log(err.messages);
+ *   }
+ *
+ * NOTE: These functions are called from React components (client-side only).
+ */
+
 import { getToken } from "./auth";
 
 // ─── Config ───────────────────────────────────────────────────────────────────
-
+// Base URL for all API calls. Set via environment variable in .env.local.
 const BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
 // ─── Error Class ──────────────────────────────────────────────────────────────

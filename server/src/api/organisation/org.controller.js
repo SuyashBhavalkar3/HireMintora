@@ -1,3 +1,15 @@
+/**
+ * @file org.controller.js
+ * @description Controller for organisation management — create and join.
+ *
+ * Endpoints handled:
+ *   - GET  /api/organisation       — Fetch current user's organisation details.
+ *   - POST /api/organisation/setup — Create a new org (user becomes OWNER) or join via orgCode (MEMBER).
+ *
+ * Organisation creation is wrapped in a Prisma transaction to ensure atomicity
+ * between creating the org and linking the user in a single database round-trip.
+ */
+
 const crypto = require("crypto");
 const { prisma } = require("../../lib/prismaClient");
 const { validateOrganisationSetup } = require("./org.validators");

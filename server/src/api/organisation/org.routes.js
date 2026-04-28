@@ -1,3 +1,10 @@
+/**
+ * @file org.routes.js
+ * @description Express router for organisation endpoints.
+ * Mounts at /api/organisation (see api/index.js).
+ * All routes require JWT authentication via authenticateUser middleware.
+ */
+
 const express = require("express");
 const { setupOrganisation, getOrganisation } = require("./org.controller");
 const { authenticateUser } = require("../../middlewares/auth.middleware");

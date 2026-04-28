@@ -1,3 +1,23 @@
+/**
+ * @file interviewSession.js
+ * @description Per-session interview orchestrator — the heart of the AI interview engine.
+ *
+ * Each InterviewSession instance manages:
+ *   - The FSM state machine (LISTENING → PROCESSING → SPEAKING).
+ *   - Multiple attached WebSocket clients (via addClient/removeClient).
+ *   - The full STT → LLM → TTS pipeline for each conversation turn.
+ *   - Conversation history persistence to the database (Prisma).
+ *   - Turn cancellation and cleanup on disconnect.
+ *
+ * Lifecycle:
+ *   1. Created by SessionManager when a new sessionId connects.
+ *   2. Clients attach/detach as WebSocket connections open/close.
+ *   3. Audio chunks flow in → STT transcription → LLM generates response →
+ *      SentenceBuffer batches into sentences → TTS streams audio back.
+ *   4. Each turn's messages are committed to the Interview/Message tables.
+ *   5. Destroyed when the last client disconnects (after cleanup timeout).
+ */
+
 const { randomUUID } = require("crypto");
 const { WebSocket } = require("ws");
 const { SentenceBuffer } = require("./sentenceBuffer");

@@ -1,9 +1,27 @@
+/**
+ * @file userAuth.validators.js
+ * @description Input validation helpers for the User authentication endpoints.
+ * Each function returns an array of error message strings (empty = valid).
+ * Called from the controller layer before any database operations.
+ */
+
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
+/**
+ * Tests whether a string is a plausible email address.
+ * Uses a simple regex — not RFC 5322 compliant but sufficient for form validation.
+ * @param {string} email
+ * @returns {boolean}
+ */
 function isValidEmail(email) {
   return typeof email === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 }
 
+/**
+ * Returns true if the value is a string with at least one non-whitespace character.
+ * @param {*} val
+ * @returns {boolean}
+ */
 function isNonEmptyString(val) {
   return typeof val === "string" && val.trim().length > 0;
 }

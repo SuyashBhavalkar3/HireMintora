@@ -1,3 +1,17 @@
+/**
+ * @file auth.middleware.js
+ * @description JWT Bearer token authentication middleware.
+ *
+ * Extracts the token from the `Authorization: Bearer <token>` header,
+ * verifies it against JWT_SECRET, then performs a database lookup to
+ * confirm the user exists and is active. Attaches the user to `req.user`.
+ *
+ * PERFORMANCE NOTE: The current implementation executes a DB query on every
+ * authenticated request. For high-traffic production deployments, consider
+ * replacing the DB lookup with a Redis cache keyed by user ID, invalidated
+ * on user update/deletion.
+ */
+
 const jwt = require("jsonwebtoken");
 const { prisma } = require("../lib/prismaClient");
 

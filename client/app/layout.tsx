@@ -1,3 +1,13 @@
+/**
+ * @file layout.tsx
+ * @description Root layout for the HireMintora HR Dashboard (Next.js App Router).
+ *
+ * Responsibilities:
+ * - Imports the global CSS design system (`globals.css`).
+ * - Wraps all pages with <AuthProvider> for global authentication state.
+ * - Sets SEO metadata (title + description) for the entire dashboard app.
+ */
+
 import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";

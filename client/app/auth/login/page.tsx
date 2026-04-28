@@ -1,3 +1,16 @@
+/**
+ * @file login/page.tsx
+ * @description Login page supporting two authentication methods:
+ *   1. Manual email/password login → POST /api/auth/user/login → JWT.
+ *   2. Google OAuth via Supabase → redirects to /auth/callback.
+ *
+ * After successful login, routes the user:
+ *   - If they have an organisation → /dashboard
+ *   - If not → /onboarding (to create/join an org)
+ *
+ * Also handles OAuth error callbacks via URL query params (?error=oauth_failed).
+ */
+
 "use client";
 
 import { useState, useEffect } from "react";

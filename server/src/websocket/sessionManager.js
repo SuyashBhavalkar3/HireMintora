@@ -1,3 +1,15 @@
+/**
+ * @file sessionManager.js
+ * @description In-memory registry of active interview sessions.
+ *
+ * Maps sessionId → InterviewSession, allowing multiple WebSocket connections
+ * to share the same session state (e.g., when a candidate reconnects or
+ * when multiple browser tabs open the same interview link).
+ *
+ * NOTE: Sessions are stored in a Map (memory). On server restart, all sessions
+ * are lost. For production horizontal scaling, consider Redis-backed sessions.
+ */
+
 const { InterviewSession } = require("./interviewSession");
 
 /**

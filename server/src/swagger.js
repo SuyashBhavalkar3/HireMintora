@@ -1,3 +1,14 @@
+/**
+ * @file swagger.js
+ * @description Swagger/OpenAPI 3.0 configuration for auto-generated REST API docs.
+ *
+ * The Swagger UI is served at `/api-docs` and is auto-populated from JSDoc
+ * annotations in the route files (see `apis` glob below).
+ *
+ * Authentication: All protected endpoints require a Bearer JWT token.
+ * The `securitySchemes` section below configures the "Authorize" button in the UI.
+ */
+
 const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 

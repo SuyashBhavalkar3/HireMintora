@@ -1,3 +1,19 @@
+/**
+ * @file AuthContext.tsx
+ * @description Global authentication state provider for the HireMintora client.
+ *
+ * Wraps the entire app (via <AuthProvider> in layout.tsx) and provides:
+ *   - `user` / `token` — Current logged-in user state.
+ *   - `isLoading` — True while rehydrating auth from localStorage on first mount.
+ *   - `isAuthenticated` — Derived flag for route guards.
+ *   - `login()` — Persists token + user and updates React state.
+ *   - `logout()` — Clears storage and redirects to /auth/login.
+ *   - `updateUser()` — Used after onboarding (org setup) to refresh user context.
+ *
+ * Consumers use the `useAuth()` hook to access this context.
+ * Throws if used outside <AuthProvider>.
+ */
+
 "use client";
 
 import {

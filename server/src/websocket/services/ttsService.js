@@ -1,10 +1,38 @@
+/**
+ * @file ttsService.js
+ * @description Sarvam AI Text-to-Speech (TTS) streaming service.
+ *
+ * This service connects to Sarvam's real-time TTS WebSocket API to convert
+ * AI-generated text sentences into audio. The audio is streamed back as
+ * base64-encoded chunks for playback in the candidate's browser.
+ *
+ * Text Flow:
+ *   LLM response → SentenceBuffer → complete sentences → this service
+ *   → Sarvam TTS WebSocket → audio chunks (base64 MP3/WAV) → client
+ *
+ * Configuration: All settings are read from env vars (SARVAM_TTS_*).
+ * See `.env.example` for the full list.
+ */
+
 const { WebSocket } = require("ws");
 const { StreamingAdapter, readEnv } = require("./streamingAdapter");
 
+/**
+ * A simple async queue for bridging callback-based audio events
+ * to an async-iterable consumer (the `streamSpeech` generator).
+ *
+ * Audio chunks are pushed by the TTS WebSocket `onmessage` handler,
+ * and consumed by `streamSpeech` via `for await...of` iteration.
+ *
+ * When `close()` is called, all pending `next()` calls resolve with `done: true`.
+ */
 class AsyncQueue {
   constructor() {
+    /** @type {Array} Buffered items not yet consumed. */
     this.items = [];
+    /** @type {Array<Function>} Pending consumers waiting for items. */
     this.waiters = [];
+    /** @type {boolean} Whether the queue has been closed. */
     this.closed = false;
   }
 
@@ -41,7 +69,27 @@ class AsyncQueue {
   }
 }
 
+/**
+ * Sarvam TTS streaming service.
+ * Converts text sentences into audio via Sarvam's real-time TTS WebSocket API.
+ * Extends StreamingAdapter for connection lifecycle management.
+ *
+ * Usage (high-level via streamSpeech):
+ *   const tts = new SarvamTtsService();
+ *   for await (const audioChunk of tts.streamSpeech("Hello, world!", signal)) {
+ *     // audioChunk = { audio: '<base64>', contentType: 'audio/mpeg' }
+ *   }
+ *
+ * @extends StreamingAdapter
+ */
 class SarvamTtsService extends StreamingAdapter {
+  /**
+   * @param {Object} [options] - Override defaults from env vars.
+   * @param {string} [options.apiKey] - Sarvam API key.
+   * @param {string} [options.model] - TTS model name (default: 'bulbul:v3').
+   * @param {string} [options.speaker] - Voice persona (default: 'shubh').
+   * @param {number} [options.pace] - Speech speed multiplier (default: 1.0).
+   */
   constructor(options = {}) {
     super({
       serviceName: "tts",
@@ -218,6 +266,19 @@ class SarvamTtsService extends StreamingAdapter {
     return super.createStream(handlers, factory);
   }
 
+  /**
+   * High-level async generator that converts a text string into audio.
+   * Handles the full lifecycle: connect → send text → collect audio → yield.
+   *
+   * Yields a single concatenated audio object per sentence (not per chunk),
+   * to reduce the number of Audio elements the client creates.
+   *
+   * @param {string} text - The sentence to synthesize.
+   * @param {AbortSignal} [signal] - Optional abort signal for cancellation.
+   * @param {Object} [options] - Additional options.
+   * @param {string} [options.turnId] - Correlation ID for debugging.
+   * @yields {{ audio: string, contentType: string }} Base64 audio + MIME type.
+   */
   async *streamSpeech(text, signal, options = {}) {
     const cleanText = typeof text === "string" ? text.trim() : "";
     if (!cleanText) {

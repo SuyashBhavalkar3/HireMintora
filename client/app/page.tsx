@@ -1,3 +1,17 @@
+/**
+ * @file page.tsx (root)
+ * @description Public landing page for the HireMintora platform.
+ *
+ * This is a Server Component (no "use client") that renders:
+ *   - Navigation with Log In / Get Started CTAs.
+ *   - Hero section with value proposition and stats.
+ *   - Feature grid (6 cards) highlighting platform capabilities.
+ *   - CTA banner and footer.
+ *
+ * Accessible to unauthenticated visitors. Authenticated users should
+ * be redirected to /dashboard via the auth guard in dashboard pages.
+ */
+
 import Link from "next/link";
 
 const features = [

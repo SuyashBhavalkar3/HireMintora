@@ -1,5 +1,13 @@
-"use client";
+/**
+ * @file CandidateTable.tsx
+ * @description Presentational table component for displaying imported candidates
+ * within a specific hiring drive. Shows candidate name, email, invitation status
+ * (Pending / Invited), a truncated access token, and the import date.
+ *
+ * Used in: /dashboard/drive/[id]/page.tsx
+ */
 
+"use client";
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface Candidate {

@@ -2,36 +2,36 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #f9fafb;
-  --mint: #6ee7b7;
-  --mint-hover: #34d399;
-  --mint-light: #d1fae5;
-  --mint-dark: #059669;
-  --mint-xs: #ecfdf5;
-  --text: #0f172a;
-  --text-2: #6b7280;
+  --bg: #f8fafc;
+  --mint: #10b981;
+  --mint-hover: #059669;
+  --mint-light: #f0fdf4;
+  --mint-dark: #064e3b;
+  --mint-xs: #f0fdfa;
+  --text: #1e293b;
+  --text-2: #64748b;
   --white: #ffffff;
-  --border: #e5e7eb;
-  --border-2: #d1d5db;
+  --border: #f1f5f9;
+  --border-2: #e2e8f0;
   --card: #ffffff;
   --error: #ef4444;
-  --error-light: #fee2e2;
+  --error-light: #fef2f2;
   --success: #10b981;
-  --success-light: #d1fae5;
+  --success-light: #f0fdf4;
 
-  --r-sm: 6px;
-  --r-md: 10px;
-  --r-lg: 16px;
-  --r-xl: 24px;
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 20px;
+  --r-xl: 32px;
   --r-full: 9999px;
 
-  --sh-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --sh-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
-  --sh-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
-  --sh-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --sh-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --sh-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  --sh-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+  --sh-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
 
-  --t: 150ms ease;
-  --t-slow: 250ms ease;
+  --t: 200ms ease;
+  --t-slow: 400ms ease;
 }
 
 *,
@@ -129,4 +129,45 @@ body {
   -webkit-text-fill-color: transparent;
   background-clip: text;
   cursor: pointer;
+}
+
+@keyframes slideUpFade {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.8);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 15px rgba(16, 185, 129, 0);
+  }
+  100% {
+    transform: scale(0.8);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 2.5s infinite cubic-bezier(0.455, 0.03, 0.515, 0.955);
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(255, 255, 255, 0.5);
 }

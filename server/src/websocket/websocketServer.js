@@ -1,3 +1,19 @@
+/**
+ * @file websocketServer.js
+ * @description WebSocket server factory for the AI interview engine.
+ *
+ * Creates a `ws` WebSocketServer that upgrades HTTP connections at `/ws/interview`.
+ * On each new connection:
+ *   1. Parses query params (sessionId, tokenId, mode).
+ *   2. Creates or retrieves an InterviewSession via SessionManager.
+ *   3. Instantiates STT, LLM, and TTS service singletons (shared across sessions).
+ *   4. Routes incoming messages (audio_chunk, audio_end, text_answer, etc.)
+ *      to the appropriate session method.
+ *   5. Handles disconnect and cleanup.
+ *
+ * Called from server.js after the HTTP server is created.
+ */
+
 const { WebSocketServer } = require("ws");
 const { SessionManager } = require("./sessionManager");
 const { ConfigurableLlmService } = require("./services/llmService");

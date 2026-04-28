@@ -1,3 +1,20 @@
+/**
+ * @file ImportCandidatesModal.tsx
+ * @description Modal dialog for bulk-importing candidates into a hiring drive.
+ *
+ * Input format: One candidate per line in the textarea, comma-separated:
+ *   email@example.com, Full Name
+ *
+ * The `parseCandidates()` function extracts and validates entries,
+ * then the component calls `apiImportCandidates()` for the batch upsert.
+ * Candidates with existing emails in the same drive get their tokens refreshed.
+ *
+ * Props:
+ * - driveId: The hiring drive to import into.
+ * - onClose: Callback to dismiss the modal.
+ * - onImported: Callback to trigger a candidate list refresh after import.
+ */
+
 "use client";
 
 import { useState } from "react";
