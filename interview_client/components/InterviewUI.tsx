@@ -31,6 +31,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { Mic, MicOff, Square, Loader2, Play, AlertCircle } from "lucide-react";
+import CodeEditor from "./CodeEditor";
 
 type Message = {
   id: string;
@@ -41,6 +42,7 @@ type Message = {
 
 export default function InterviewUI({ tokenId }: { tokenId: string }) {
   const [status, setStatus] = useState<"DISCONNECTED" | "CONNECTING" | "LISTENING" | "PROCESSING" | "SPEAKING">("DISCONNECTED");
+  const [mode, setMode] = useState<"default" | "coding">("default");
   const [messages, setMessages] = useState<Message[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isFinishing, setIsFinishing] = useState(false);
@@ -125,11 +127,15 @@ export default function InterviewUI({ tokenId }: { tokenId: string }) {
    * Message types mirror the server's WS_EVENTS constants.
    */
   const handleSocketMessage = (message: any) => {
-    const { type, payload, state } = message;
+    const { type, payload } = message;
     
     if (type === "state_change") {
       setStatus(payload.state as any);
       setIsFinishing(false);
+
+      if (payload.mode) {
+        setMode(payload.mode);
+      }
       
       if (payload.error) {
         setError(payload.error);
@@ -180,13 +186,6 @@ export default function InterviewUI({ tokenId }: { tokenId: string }) {
 
   /**
    * Initializes the microphone and creates an AudioWorklet pipeline.
-   *
-   * Audio Flow:
-   *   MediaStream (mic) → MediaStreamSource → AudioWorkletNode (pcm-processor)
-   *   → port.onmessage → base64 encode → WebSocket send
-   *
-   * The AudioWorklet runs at 16kHz sample rate and outputs raw PCM16 buffers.
-   * Requires `/audio-processor.js` to be served from the public directory.
    */
   const startRecording = async () => {
     if (audioContext.current) return;
@@ -259,7 +258,6 @@ export default function InterviewUI({ tokenId }: { tokenId: string }) {
   const handleInterrupt = () => {
     if (ws.current?.readyState === WebSocket.OPEN) {
       ws.current.send(JSON.stringify({ type: "cancel_turn" }));
-      // The server will respond with a state_change to LISTENING, which will trigger startRecording
       audioQueue.current = []; // Clear any pending TTS
       if (nextAudioElement.current) {
         nextAudioElement.current.pause();
@@ -278,10 +276,17 @@ export default function InterviewUI({ tokenId }: { tokenId: string }) {
     stopRecording();
   };
 
+  const handleSubmitCode = (code: string, language: string) => {
+    if (ws.current?.readyState === WebSocket.OPEN) {
+      ws.current.send(JSON.stringify({
+        type: "code_submission",
+        payload: { code, language }
+      }));
+    }
+  };
+
   /**
    * Enqueues a base64 audio chunk for sequential playback.
-   * Audio chunks arrive from tts_audio_chunk events and are played one at a time
-   * using HTML5 Audio elements, preventing overlapping playback.
    */
   const playAudio = (base64Audio: string) => {
     audioQueue.current.push(base64Audio);
@@ -350,172 +355,155 @@ export default function InterviewUI({ tokenId }: { tokenId: string }) {
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-[#f8fafc] min-h-0">
-      {/* Interview Sub-header */}
-      <div className="bg-white/70 backdrop-blur-md border-b border-slate-100 z-10 relative">
-        <div className="max-w-4xl w-full mx-auto px-6 md:px-12 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            {status === "LISTENING" && (
-              <span className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.1em] px-4 py-2 bg-emerald-50 text-emerald-600 rounded-full border border-emerald-100/50">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                Listening
-              </span>
-            )}
-            {status === "PROCESSING" && (
-              <span className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.1em] px-4 py-2 bg-slate-50 text-slate-500 rounded-full border border-slate-100">
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                Thinking
-              </span>
-            )}
-            {status === "SPEAKING" && (
-              <span className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.1em] px-4 py-2 bg-indigo-50 text-indigo-500 rounded-full border border-indigo-100/50">
-                <div className="flex gap-0.5 items-center justify-center">
-                   <span className="w-1 h-3 bg-indigo-400 rounded-full animate-bounce" style={{animationDelay: "0ms"}}></span>
-                   <span className="w-1 h-4 bg-indigo-400 rounded-full animate-bounce" style={{animationDelay: "150ms"}}></span>
-                   <span className="w-1 h-3 bg-indigo-400 rounded-full animate-bounce" style={{animationDelay: "300ms"}}></span>
-                </div>
-                Speaking
-              </span>
-            )}
-            {status === "CONNECTING" && (
-              <span className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.1em] px-4 py-2 bg-slate-50 text-slate-400 rounded-full border border-slate-100">
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                Connecting
-              </span>
+    <div className="flex-1 flex bg-[#f8fafc] overflow-hidden">
+      {/* Left Column: Chat Experience */}
+      <div className="flex-1 flex flex-col border-r border-slate-100 bg-white min-w-0">
+        {/* Interview Sub-header */}
+        <div className="bg-white/70 backdrop-blur-md border-b border-slate-100 z-10 relative">
+          <div className="w-full px-6 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              {status === "LISTENING" && (
+                <span className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.1em] px-4 py-2 bg-emerald-50 text-emerald-600 rounded-full border border-emerald-100/50">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                  Listening
+                </span>
+              )}
+              {status === "PROCESSING" && (
+                <span className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.1em] px-4 py-2 bg-slate-50 text-slate-500 rounded-full border border-slate-100">
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                  Thinking
+                </span>
+              )}
+              {status === "SPEAKING" && (
+                <span className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.1em] px-4 py-2 bg-indigo-50 text-indigo-500 rounded-full border border-indigo-100/50">
+                  <div className="flex gap-0.5 items-center justify-center">
+                     <span className="w-0.5 h-2.5 bg-indigo-400 rounded-full animate-bounce" style={{animationDelay: "0ms"}}></span>
+                     <span className="w-0.5 h-3 bg-indigo-400 rounded-full animate-bounce" style={{animationDelay: "150ms"}}></span>
+                     <span className="w-0.5 h-2.5 bg-indigo-400 rounded-full animate-bounce" style={{animationDelay: "300ms"}}></span>
+                  </div>
+                  Speaking
+                </span>
+              )}
+            </div>
+            
+            {/* Interrupt Button */}
+            {(status === "SPEAKING" || status === "PROCESSING") && (
+              <button 
+                onClick={handleInterrupt}
+                className="flex items-center gap-2 text-[12px] font-semibold px-4 py-2 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-xl transition-all border border-rose-100"
+              >
+                <Square className="w-3 h-3 fill-current" /> Stop AI
+              </button>
             )}
           </div>
-          
-          {/* Interrupt Button */}
-          {(status === "SPEAKING" || status === "PROCESSING") && (
-            <button 
-              onClick={handleInterrupt}
-              className="flex items-center gap-2 text-[13px] font-semibold px-4 py-2 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-xl transition-all border border-rose-100"
-            >
-              <Square className="w-3.5 h-3.5 fill-current" /> Stop AI
-            </button>
+        </div>
+
+        {/* Chat Messages */}
+        <div className="flex-1 overflow-y-auto p-6 md:p-8 flex flex-col gap-8 scroll-smooth">
+          {error && (
+            <div className="bg-rose-50 text-rose-700 p-5 rounded-2xl flex items-start gap-3 border border-rose-100 animate-slide-up">
+              <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5 text-rose-500" />
+              <div>
+                <p className="font-bold text-sm tracking-tight">Something went wrong</p>
+                <p className="text-sm mt-1 opacity-80">{error}</p>
+              </div>
+            </div>
+          )}
+
+          {messages.length === 0 && status === "LISTENING" && (
+            <div className="flex flex-col items-center justify-center flex-1 text-center opacity-40 animate-slide-up mt-12">
+              <div className="w-20 h-20 rounded-[28px] bg-slate-100 flex items-center justify-center mb-6">
+                <Mic className="w-8 h-8 text-slate-400" />
+              </div>
+              <p className="font-semibold text-slate-500 text-[15px]">Waiting for your introduction...</p>
+            </div>
+          )}
+
+          <div className="flex flex-col gap-8">
+            {messages.map((msg, i) => (
+              <div key={`${msg.id}-${i}`} className={`flex w-full animate-slide-up ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div className={`flex gap-4 max-w-[90%] md:max-w-[85%] ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+                  <div className={`flex-shrink-0 w-8 h-8 rounded-xl flex items-center justify-center shadow-sm border ${
+                    msg.role === 'user' ? 'bg-white border-slate-100 text-emerald-500' : 'bg-emerald-500 border-emerald-500 text-white shadow-emerald-100 shadow-md'
+                  }`}>
+                    {msg.role === 'user' ? <span className="font-bold text-[9px] tracking-widest uppercase">Me</span> : <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>}
+                  </div>
+                  <div className={`rounded-[20px] px-5 py-4 relative ${
+                    msg.role === 'user' 
+                      ? 'bg-[#10b981] text-white' 
+                      : 'bg-[#f8fafc] border border-slate-100 text-slate-700 shadow-sm'
+                  }`}>
+                    <div className={`flex items-center gap-2 mb-1 text-[9px] font-bold uppercase tracking-[0.15em] ${
+                      msg.role === 'user' ? 'text-emerald-100' : 'text-slate-400'
+                    }`}>
+                      {msg.role === 'user' ? 'Candidate' : 'HireMintora AI'}
+                    </div>
+                    <p className="text-[15px] leading-relaxed font-medium whitespace-pre-wrap">{msg.text}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="h-4"></div>
+        </div>
+
+        {/* Footer: Recording Controls */}
+        <div className="px-6 py-6 bg-white border-t border-slate-100 z-20">
+          {status === "LISTENING" ? (
+            isRecording ? (
+              <div className="flex items-center justify-between bg-emerald-50/50 border border-emerald-100 rounded-2xl p-3 pl-6 pr-3 transition-all animate-slide-up">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center animate-pulse-ring relative">
+                    <Mic className="w-5 h-5 relative z-10" />
+                  </div>
+                  <p className="text-[15px] font-bold text-emerald-800">Recording...</p>
+                </div>
+                <button onClick={handleDoneSpeaking} className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-5 py-2.5 rounded-xl flex items-center gap-2 shadow-lg shadow-emerald-100 transition-all text-sm">
+                  <Square className="w-3.5 h-3.5 fill-current" /> Submit
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center justify-between gap-6 animate-slide-up">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 border border-slate-100">
+                    <Mic className="w-5 h-5" />
+                  </div>
+                  <div className="hidden sm:block">
+                    <p className="text-[15px] font-bold text-slate-800">{isFinishing ? "Processing..." : "Speak whenever ready"}</p>
+                    <p className="text-[12px] text-slate-400 font-medium">Click to record response</p>
+                  </div>
+                </div>
+                <button onClick={handleStartSpeaking} disabled={isFinishing} className="flex-1 sm:flex-none bg-[#10b981] hover:bg-[#059669] text-white font-bold px-6 py-3.5 rounded-xl flex items-center justify-center gap-3 transition-all shadow-md disabled:opacity-30 text-sm">
+                  <Mic className="w-4 h-4" /> Record Answer
+                </button>
+              </div>
+            )
+          ) : status === "SPEAKING" ? (
+            <div className="flex flex-col items-center justify-center gap-3 animate-slide-up">
+               <div className="flex items-end justify-center gap-1 h-8">
+                {[1,2,3,4,5,6,7,8].map(i => (
+                  <div key={i} className="w-1 bg-[#10b981] rounded-full animate-pulse" 
+                       style={{ height: `${Math.random() * 60 + 40}%`, animationDelay: `${i*0.1}s`, animationDuration: '0.6s' }}></div>
+                ))}
+              </div>
+              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">AI is speaking</p>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center gap-4 px-6 py-3 bg-slate-50/50 rounded-xl border border-slate-100 animate-slide-up">
+               <MicOff className="w-4 h-4 text-slate-300" />
+               <p className="text-[13px] font-semibold text-slate-400">Microphone inactive</p>
+            </div>
           )}
         </div>
       </div>
 
-      {/* Main Content Area */}
-      <div className="flex-1 overflow-y-auto p-6 md:p-12 flex flex-col gap-10 max-w-4xl w-full mx-auto relative scroll-smooth">
-        {error && (
-          <div className="bg-rose-50 text-rose-700 p-5 rounded-2xl flex items-start gap-3 border border-rose-100 animate-slide-up">
-            <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5 text-rose-500" />
-            <div>
-              <p className="font-bold text-sm tracking-tight">Something went wrong</p>
-              <p className="text-sm mt-1 opacity-80">{error}</p>
-            </div>
-          </div>
-        )}
-
-        {messages.length === 0 && status === "LISTENING" && (
-          <div className="flex flex-col items-center justify-center flex-1 text-center opacity-40 animate-slide-up mt-12">
-            <div className="w-24 h-24 rounded-[32px] bg-slate-100 flex items-center justify-center mb-6">
-              <Mic className="w-10 h-10 text-slate-400" />
-            </div>
-            <p className="font-semibold text-slate-500 text-lg">Waiting for your introduction...</p>
-          </div>
-        )}
-
-        <div className="flex flex-col gap-10">
-          {messages.map((msg, i) => (
-            <div key={`${msg.id}-${i}`} className={`flex w-full animate-slide-up ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`flex gap-5 max-w-[90%] md:max-w-[80%] ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                
-                {/* Avatar */}
-                <div className={`flex-shrink-0 w-10 h-10 rounded-2xl flex items-center justify-center shadow-sm border ${
-                  msg.role === 'user' ? 'bg-white border-slate-100 text-emerald-500' : 'bg-emerald-500 border-emerald-500 text-white shadow-emerald-100 shadow-md'
-                }`}>
-                  {msg.role === 'user' ? <span className="font-bold text-[10px] tracking-widest uppercase">Me</span> : <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>}
-                </div>
-
-                {/* Bubble */}
-                <div className={`rounded-[24px] px-7 py-5 relative ${
-                  msg.role === 'user' 
-                    ? 'bg-[#10b981] text-white shadow-[0_8px_20px_-8px_rgba(16,185,129,0.3)]' 
-                    : 'bg-white border border-slate-100 text-slate-700 shadow-[0_4px_20px_rgba(0,0,0,0.02)]'
-                }`}>
-                  <div className={`flex items-center gap-2 mb-2 text-[10px] font-bold uppercase tracking-[0.15em] ${
-                    msg.role === 'user' ? 'text-emerald-100' : 'text-slate-400'
-                  }`}>
-                    {msg.role === 'user' ? 'Candidate' : 'HireMintora AI'}
-                    {msg.isPartial && msg.role === 'user' && <Loader2 className="w-3 h-3 animate-spin inline ml-1 opacity-60" />}
-                  </div>
-                  <p className="text-[16px] leading-[1.75] font-medium whitespace-pre-wrap">{msg.text}</p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-        
-        <div className="h-20"></div>
-      </div>
-
-      {/* Footer Visualizer Area */}
-      <div className="px-8 py-8 bg-white/70 backdrop-blur-md border-t border-slate-100 flex justify-center items-center h-32 z-20 sticky bottom-0">
-        {status === "LISTENING" ? (
-          isRecording ? (
-            <div className="flex items-center justify-between w-full max-w-2xl bg-emerald-50/50 border border-emerald-100 rounded-[28px] p-4 pl-8 pr-5 transition-all">
-              <div className="flex items-center gap-5">
-                <div className="w-12 h-12 rounded-[18px] bg-emerald-500 text-white flex items-center justify-center animate-pulse-ring relative">
-                  <Mic className="w-6 h-6 relative z-10" />
-                </div>
-                <p className="text-[16px] font-bold text-emerald-800">
-                  Recording...
-                </p>
-              </div>
-              
-              <button 
-                onClick={handleDoneSpeaking} 
-                className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-3 rounded-2xl flex items-center gap-2 shadow-lg shadow-emerald-100 transition-all"
-              >
-                <Square className="w-4 h-4 fill-current" />
-                Submit
-              </button>
-            </div>
-          ) : (
-            <div className="flex items-center justify-between w-full max-w-2xl gap-8 px-2">
-              <div className="flex items-center gap-5">
-                <div className="w-14 h-14 rounded-[22px] bg-slate-50 flex items-center justify-center text-slate-400 border border-slate-100">
-                  <Mic className="w-6 h-6" />
-                </div>
-                <div className="space-y-1">
-                  <p className="text-[16px] font-bold text-slate-800">
-                    {isFinishing ? "Processing..." : "Speak whenever you're ready"}
-                  </p>
-                  <p className="text-[13px] text-slate-400 font-medium">{isFinishing ? "Please wait a moment" : "Click the button to record your response"}</p>
-                </div>
-              </div>
-              
-              <button 
-                onClick={handleStartSpeaking} 
-                disabled={isFinishing}
-                className="bg-[#10b981] hover:bg-[#059669] text-white font-bold px-8 py-4 rounded-2xl flex items-center gap-3 transition-all shadow-[0_10px_25px_-8px_rgba(16,185,129,0.4)] disabled:opacity-30"
-              >
-                <Mic className="w-5 h-5" />
-                Record Answer
-              </button>
-            </div>
-          )
-        ) : status === "SPEAKING" ? (
-          <div className="flex flex-col items-center justify-center gap-4 w-full">
-             <div className="flex items-end justify-center gap-1.5 h-10">
-              {[1,2,3,4,5,6,7,8,9,10,11,12].map(i => (
-                <div key={i} className="w-1.5 bg-[#10b981] rounded-full animate-pulse" 
-                     style={{ height: `${Math.random() * 70 + 30}%`, animationDelay: `${i*0.08}s`, animationDuration: '0.6s' }}></div>
-              ))}
-            </div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400">AI is speaking</p>
-          </div>
-        ) : (
-          <div className="flex items-center justify-center gap-4 w-full px-6 py-4 bg-slate-50/50 rounded-2xl border border-slate-100 max-w-md">
-             <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-300">
-              <MicOff className="w-5 h-5" />
-            </div>
-            <p className="text-[14px] font-semibold text-slate-400">Microphone inactive</p>
-          </div>
-        )}
+      {/* Right Column: Code Editor */}
+      <div className="flex-1 min-w-0 bg-[#1e1e1e]">
+        <CodeEditor 
+          isEnabled={mode === "coding"} 
+          onSubmitCode={handleSubmitCode}
+          isProcessing={status === "PROCESSING"}
+        />
       </div>
     </div>
   );
