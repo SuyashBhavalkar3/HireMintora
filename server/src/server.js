@@ -33,6 +33,7 @@ process.on('unhandledRejection', (reason, promise) => {
 const { createInterviewWebSocketServer } = require("./websocket");
 const { swaggerUi, specs } = require("./swagger");
 const { userAuthRouter, organisationRouter, driveRouter } = require("./api");
+const candidateRouter = require("./api/drive/candidate.routes");
 
 const app = express();
 
@@ -67,6 +68,7 @@ app.use(express.static(path.join(__dirname, "..", "public")));
 app.use("/api/auth/user", userAuthRouter);
 app.use("/api/organisation", organisationRouter);
 app.use("/api/drive", driveRouter);
+app.use("/api/candidate", candidateRouter);
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 

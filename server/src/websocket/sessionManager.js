@@ -67,9 +67,9 @@ class SessionManager {
    * @param {Object} options - Optional configuration for the session.
    * @returns {InterviewSession} The active interview session instance.
    */
-  attachConnection(sessionId, ws, options = {}) {
+  async attachConnection(sessionId, ws, options = {}) {
     const session = this.getOrCreateSession(sessionId, options);
-    session.attachConnection(ws);
+    await session.attachConnection(ws);
     return session;
   }
 

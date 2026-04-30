@@ -76,7 +76,7 @@ function createInterviewWebSocketServer(httpServer, options = {}) {
     prisma,
   });
 
-  wss.on("connection", (ws, req) => {
+  wss.on("connection", async (ws, req) => {
     const requestUrl = new URL(req.url, "http://localhost");
     const sessionId = requestUrl.searchParams.get("sessionId");
     const tokenId = requestUrl.searchParams.get("tokenId");
@@ -91,7 +91,7 @@ function createInterviewWebSocketServer(httpServer, options = {}) {
     // fetched from the database using the tokenId to give candidate-specific context.
     const systemPrompt = "You are a senior technical interviewer. Respond conversationally in 2-4 concise sentences. Ask one useful follow-up question at the end.";
 
-    let activeSession = sessionManager.attachConnection(sessionId, ws, { 
+    let activeSession = await sessionManager.attachConnection(sessionId, ws, { 
       mode,
       tokenId: tokenId || null,
       systemPrompt

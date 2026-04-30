@@ -242,9 +242,51 @@ const sendLinksToAll = async (req, res) => {
   }
 };
 
+/**
+ * Validates a candidate's secure token.
+ * This is a public endpoint used by the interview_client to verify that a link
+ * is valid and associated with an existing candidate before starting the interview.
+ *
+ * @param {Object} req - Express request object.
+ * @param {Object} req.query - The query parameters.
+ * @param {string} req.query.token - The token to validate.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<Object>} 200 if valid, 404 if invalid, 500 on error.
+ */
+const validateToken = async (req, res) => {
+  try {
+    const { token } = req.query;
+
+    if (!token) {
+      return res.status(400).json({ error: "Token is required" });
+    }
+
+    const candidate = await prisma.driveCandidate.findUnique({
+      where: { token },
+      select: { id: true, fullName: true, email: true }
+    });
+
+    if (!candidate) {
+      return res.status(404).json({ error: "Invalid interview link or token" });
+    }
+
+    return res.status(200).json({
+      valid: true,
+      candidate: {
+        fullName: candidate.fullName,
+        email: candidate.email
+      }
+    });
+  } catch (error) {
+    console.error("Error in validateToken:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 module.exports = {
   createHiringDrive,
   importCandidates,
   getDriveCandidates,
-  sendLinksToAll
+  sendLinksToAll,
+  validateToken
 };

@@ -139,6 +139,23 @@ export default async function InterviewPage({
     return <InvalidLinkPage />;
   }
 
+  // VALIDATION BENCHMARK: Verify token existence in DB via backend API 
+  // before granting access to the Interview UI.
+  try {
+    const response = await fetch(`http://localhost:3000/api/candidate/validate-token?token=${tokenId}`, { 
+      cache: 'no-store', // Always verify against DB, do not cache invalid results
+    });
+
+    if (!response.ok) {
+      console.log(`[InterviewPage] Token validation failed: ${tokenId}`);
+      return <InvalidLinkPage />;
+    }
+  } catch (error) {
+    console.warn("[InterviewPage] Backend connection error during validation:", error);
+    // In production, you might want a specialized "Service Unavailable" page
+    return <InvalidLinkPage />;
+  }
+
   return (
     <div className="flex flex-col h-screen overflow-hidden">
       <BrandNavbar />

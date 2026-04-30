@@ -70,10 +70,24 @@ class InterviewSession {
    */
   async attachConnection(ws) {
     this.connections.add(ws);
-    this._emitStateChange(null, "connected");
+    
+    // Ensure we have a valid interview record as soon as someone connects.
+    // If validation fails (e.g. token not in DB), we stop early.
+    const isValid = await this._ensureInterviewRecord();
+    
+    if (!isValid) {
+      this._emit(WS_EVENTS.STATE_CHANGE, {
+        state: "DISCONNECTED",
+        reason: "invalid_token",
+        error: "Access Denied: Your interview token is invalid or has expired.",
+        sessionId: this.sessionId
+      });
+      // Optionally close the connection after a short delay to ensure message delivery
+      setTimeout(() => ws.close(), 1000);
+      return;
+    }
 
-    // Ensure we have an interview record as soon as someone connects
-    await this._ensureInterviewRecord();
+    this._emitStateChange(null, "connected");
   }
 
   detachConnection(ws) {
@@ -147,7 +161,7 @@ class InterviewSession {
    * Generates a hidden prompt to force the AI to introduce itself.
    */
   async handleStartInterview() {
-    if (!this.stateMachine.isListening()) {
+    if (!this.interviewId || !this.stateMachine.isListening()) {
       return;
     }
 
@@ -165,7 +179,7 @@ class InterviewSession {
    * @param {Object} payload - The payload containing the text answer.
    */
   async handleTextAnswer(payload = {}) {
-    if (!this.stateMachine.isListening()) {
+    if (!this.interviewId || !this.stateMachine.isListening()) {
       return;
     }
 
@@ -190,7 +204,7 @@ class InterviewSession {
    * @param {Object} payload - The payload containing the submitted code.
    */
   async handleCodeSubmission(payload = {}) {
-    if (this.mode !== INTERVIEW_MODES.CODING) {
+    if (!this.interviewId || this.mode !== INTERVIEW_MODES.CODING) {
       return;
     }
 
@@ -500,9 +514,20 @@ class InterviewSession {
     }
   }
 
+  /**
+   * Validates the candidate token and ensures an interview record exists.
+   * Returns true if valid/created, false if candidate not found.
+   *
+   * @returns {Promise<boolean>}
+   * @private
+   */
   async _ensureInterviewRecord() {
-    if (this.interviewId || !this.tokenId || !this.prisma) {
-      return;
+    if (this.interviewId) {
+      return true;
+    }
+
+    if (!this.tokenId || !this.prisma) {
+      return false;
     }
 
     try {
@@ -512,13 +537,11 @@ class InterviewSession {
       });
 
       if (!candidate) {
-        console.error(`[InterviewSession] Candidate not found for token: ${this.tokenId}`);
-        return;
+        console.error(`[InterviewSession] Access Denied: Token ${this.tokenId} not found in database.`);
+        return false;
       }
 
       // Check if there's an active (STARTED) interview for this candidate
-      // For now, we'll just create a new one each time they connect if none is active,
-      // or we can reuse the last one.
       const existingInterview = await this.prisma.interview.findFirst({
         where: {
           candidateId: candidate.id,
@@ -538,8 +561,10 @@ class InterviewSession {
         });
         this.interviewId = newInterview.id;
       }
+      return true;
     } catch (error) {
-      console.error("[InterviewSession] Failed to ensure interview record:", error);
+      console.error("[InterviewSession] Database error during token validation:", error);
+      return false;
     }
   }
 

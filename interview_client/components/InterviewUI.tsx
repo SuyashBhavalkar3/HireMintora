@@ -143,9 +143,14 @@ export default function InterviewUI({ tokenId }: { tokenId: string }) {
         setError(null);
       }
 
-      if (payload.state !== "LISTENING") {
+      if (payload.state !== "LISTENING" || payload.reason === "invalid_token") {
         stopRecording();
         setIsRecording(false);
+      }
+
+      if (payload.reason === "invalid_token") {
+        setHasStarted(true); // Ensure we don't flip back to start screen
+        setError(payload.error || "Your interview link is invalid.");
       }
     }
     
