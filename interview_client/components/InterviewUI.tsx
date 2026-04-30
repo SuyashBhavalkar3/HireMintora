@@ -438,7 +438,16 @@ export default function InterviewUI({ tokenId }: { tokenId: string }) {
                     }`}>
                       {msg.role === 'user' ? 'Candidate' : 'HireMintora AI'}
                     </div>
-                    <p className="text-[15px] leading-relaxed font-medium whitespace-pre-wrap">{msg.text}</p>
+                    <p className="text-[15px] leading-relaxed font-medium whitespace-pre-wrap">
+                      {/* 
+                         * CONTROL LOGIC: We scan bot messages for [ENABLE_EDITOR] or [DISABLE_EDITOR] tags.
+                         * These tags are used by the server to switch between conversational and coding modes.
+                         * We strip them from the UI to keep the candidate experience clean.
+                         */}
+                      {msg.role === "bot" 
+                        ? msg.text.replace(/\[(ENABLE|DISABLE)_EDITOR\]/g, "").trim() 
+                        : msg.text}
+                    </p>
                   </div>
                 </div>
               </div>

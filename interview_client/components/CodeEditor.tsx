@@ -13,7 +13,7 @@
  *     and the submit button activates. The candidate can write code and submit it.
  *
  * State is controlled entirely by the parent component (InterviewUI), which
- * receives EDITOR_STATE_CHANGE events from the WebSocket server.
+ * receives STATE_CHANGE events with a 'mode' (default vs coding) from the WebSocket server.
  *
  * @param {boolean} isEnabled - Whether the editor is interactive (unlocked).
  * @param {function} onSubmitCode - Callback fired with (code, language) when the candidate submits.

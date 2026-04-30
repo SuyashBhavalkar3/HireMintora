@@ -40,7 +40,11 @@ class InterviewSession {
     this.sessionId = sessionId;
     this.tokenId = options.tokenId || null;
     this.mode = options.mode || INTERVIEW_MODES.DEFAULT;
-    this.systemPrompt = options.systemPrompt || "You are a senior technical interviewer. Respond conversationally in 2-4 concise sentences. Ask one useful follow-up question at the end.";
+    this.systemPrompt = options.systemPrompt || `You are a senior technical interviewer. Respond conversationally in 2-4 concise sentences. Ask one useful follow-up question at the end.
+    
+    SPECIAL CONTROLS:
+    - To ENABLE the code editor for a coding task, include the tag [ENABLE_EDITOR] in your response.
+    - To DISABLE the code editor once the task is finished, include the tag [DISABLE_EDITOR] in your response.`;
     this.connections = new Set();
     this.stateMachine = new InterviewStateMachine();
     this.sentenceBuffer = new SentenceBuffer();
@@ -101,9 +105,8 @@ class InterviewSession {
    * @param {Object} payload - The payload containing the audio chunk.
    */
   async handleAudioChunk(payload = {}) {
-    if (this.mode === INTERVIEW_MODES.CODING) {
-      return;
-    }
+    // We now allow audio in CODING mode to support "think-aloud" behavior.
+    // However, we still enforce the state machine being in LISTENING state.
 
     if (!this.stateMachine.isListening()) {
       return;
@@ -126,9 +129,7 @@ class InterviewSession {
   }
 
   async handleAudioEnd() {
-    if (this.mode === INTERVIEW_MODES.CODING) {
-      return;
-    }
+    // We now allow audio in CODING mode.
 
     this.sttStreamBlocked = false;
 
@@ -286,10 +287,11 @@ class InterviewSession {
 
     try {
       const history = await this._getInterviewHistory();
+      const dynamicSystemPrompt = `${this.systemPrompt}\n\n[SYSTEM_NOTE: The code editor is currently ${this.mode === INTERVIEW_MODES.CODING ? 'ENABLED' : 'LOCKED'}. If you are starting a coding task and it is LOCKED, you MUST include the [ENABLE_EDITOR] tag in your response. if the task is done, use [DISABLE_EDITOR].]`;
 
       for await (const token of this.llmService.streamInterviewResponse({
         transcript,
-        systemPrompt: this.systemPrompt,
+        systemPrompt: dynamicSystemPrompt,
         signal: abortController.signal,
         history,
       })) {
@@ -309,6 +311,7 @@ class InterviewSession {
       // Commit full AI response
       if (fullAiResponse.trim()) {
         await this._commitMessage("llm", fullAiResponse.trim());
+        this._handleTriggers(fullAiResponse);
       }
     } catch (error) {
       this._emitStateChange(turnId, "processing_error", error.message);
@@ -368,6 +371,7 @@ class InterviewSession {
       // Commit full AI evaluation
       if (fullAiResponse.trim()) {
         await this._commitMessage("llm", fullAiResponse.trim());
+        this._handleTriggers(fullAiResponse);
       }
     } catch (error) {
       this._emitStateChange(turnId, "code_evaluation_error", error.message);
@@ -380,6 +384,45 @@ class InterviewSession {
         this.stateMachine.transition(INTERVIEW_STATES.LISTENING);
       }
       this._emitStateChange(turnId, "listening");
+    }
+  }
+
+  /**
+   * Scans AI text for special control tags to update the interview mode.
+   * [ENABLE_EDITOR] -> Switch to CODING mode.
+   * [DISABLE_EDITOR] -> Switch to DEFAULT mode.
+   *
+   * @param {string} text - The full AI response text.
+   * @private
+   */
+  _handleTriggers(text) {
+    // 1. Explicit Tag Detection (Primary)
+    if (text.includes("[ENABLE_EDITOR]")) {
+      this.setMode(INTERVIEW_MODES.CODING);
+      return;
+    } 
+    
+    if (text.includes("[DISABLE_EDITOR]")) {
+      this.setMode(INTERVIEW_MODES.DEFAULT);
+      return;
+    }
+
+    // 2. Heuristic Intent Detection (Fallback)
+    // If the editor is locked but the AI clearly asked for a coding solution, auto-enable it.
+    if (this.mode === INTERVIEW_MODES.DEFAULT) {
+      const codingIntents = [
+        /write a (python|javascript|java|c\+\+|go|rust) function/i,
+        /coding problem/i,
+        /implement a solution/i,
+        /write code to/i,
+        /in the code editor/i
+      ];
+
+      const hasCodingIntent = codingIntents.some(regex => regex.test(text));
+      if (hasCodingIntent) {
+        console.log(`[InterviewSession] Heuristic detected coding intent in turn ${this.activeTurn?.turnId}. Enabling editor.`);
+        this.setMode(INTERVIEW_MODES.CODING);
+      }
     }
   }
 
@@ -426,6 +469,10 @@ class InterviewSession {
   }
 
   _emitStateChange(turnId, reason, errorMessage = null) {
+    /**
+     * Notify all attached clients about a state or mode change.
+     * The 'mode' (default vs coding) specifically controls Monaco Editor interactivity.
+     */
     this._emit(WS_EVENTS.STATE_CHANGE, {
       state: this.stateMachine.getState(),
       reason,
